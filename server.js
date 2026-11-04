@@ -10,7 +10,7 @@
  *
  *   Website : http://localhost:3001
  *   Admin   : http://localhost:3001/admin.html
- *   Login   : admin / midland2025   (change this after first login!)
+ *   Login   : admin / ml@2026   (change this after first login!)
  * ╚══════════════════════════════════════════════════════════════╝
  */
 
@@ -107,7 +107,7 @@ async function initDb() {
 
   const { rows: adminCount } = await db.execute('SELECT COUNT(*) as count FROM admins');
   if (adminCount[0].count === 0) {
-    const defaultPass = process.env.ADMIN_PASS || 'midland2025';
+    const defaultPass = process.env.ADMIN_PASS || 'ml@2026';
     const hash = bcrypt.hashSync(defaultPass, 10);
     await db.execute({
       sql: 'INSERT INTO admins (username, password_hash) VALUES (?, ?)',

@@ -51,8 +51,11 @@ const usingTurso = !!process.env.TURSO_DATABASE_URL;
 if (!usingTurso && IS_PROD) {
   console.error('❌ TURSO_DATABASE_URL is not set — data will NOT persist on Vercel. See README.md.');
 }
+// Fallback when Turso isn't configured: a local file. Vercel's code folder is read-only,
+// so there the file goes in /tmp — the site works, but data is wiped on every cold start.
+const localDbFile = process.env.VERCEL ? '/tmp/midland.sqlite' : path.join(__dirname, 'db.sqlite');
 const db = createClient({
-  url: process.env.TURSO_DATABASE_URL || `file:${path.join(__dirname, 'db.sqlite')}`,
+  url: process.env.TURSO_DATABASE_URL || `file:${localDbFile}`,
   authToken: process.env.TURSO_AUTH_TOKEN,
 });
 
@@ -213,7 +216,13 @@ app.use((req, res, next) => {
 // Site and API share one origin, so no CORS headers are sent (other sites can't call the API from a browser).
 app.use(express.json({ limit: '50kb' }));
 app.use(express.static(path.join(__dirname, 'public'), { maxAge: IS_PROD ? '1h' : 0, extensions: ['html'] }));
-app.use((req, res, next) => { dbReady.then(() => next(), next); });
+app.use((req, res, next) => {
+  dbReady.then(() => next(), (err) => {
+    console.error('DB unavailable:', err.message);
+    if (!req.path.startsWith('/api')) return next();
+    res.status(503).json({ error: 'Database unavailable — check TURSO_DATABASE_URL and TURSO_AUTH_TOKEN in Vercel, then redeploy.' });
+  });
+});
 app.use((req, res, next) => {
   if (req.path.startsWith('/api')) console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
   next();
@@ -267,6 +276,8 @@ app.post('/api/admin/login', rateLimit(5, 15 * 60 * 1000), async (req, res) => {
   try {
     const { rows } = await db.execute({ sql: 'SELECT * FROM admins WHERE username = ?', args: [username] });
     const admin = rows[0];
+    if (!admin && Number((await db.execute('SELECT COUNT(*) as n FROM admins')).rows[0].n) === 0)
+      return res.status(503).json({ error: 'No admin account exists yet — set ADMIN_PASS in Vercel and redeploy.' });
     if (!admin || !bcrypt.compareSync(password, admin.password_hash)) {
       console.warn(`⚠️  Failed login for "${username}" from ${req.ip}`);
       return res.status(401).json({ error: 'Invalid username or password' });

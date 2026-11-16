@@ -1,171 +1,83 @@
-# 🏠 MidLand Constructions — Full Stack Website
+# MidLand Constructions — Website
 
-> Premier real estate & construction website for Lahore, Pakistan — built with Node.js, Express, and Vanilla HTML/CSS/JS.
+Real estate & construction website for MidLand Constructions (Pakistan).
+Node.js + Express + Turso (hosted SQLite), plain HTML/CSS/JS front end, deployed on Vercel.
 
----
-
-## What changed in this version
-
-A few serious issues were found and fixed:
-
-1. **The API base URL was hardcoded to `http://localhost:3001/api`** in both
-   `index.html` and `admin.html`. That meant once deployed anywhere other than
-   your own machine, every request to the backend silently failed, and the
-   site fell back to:
-   - A hardcoded demo property list on the public site — which is where the
-     **Urdu descriptions** were coming from (now rewritten in professional
-     English).
-   - A client-side-only "demo mode" in the admin panel, with hardcoded
-     credentials sitting in plain sight in the page source, managing fake data
-     in `localStorage` that no real visitor ever saw.
-
-   Fixed: both files now call `/api` (relative, same-origin), so they always
-   reach the real backend no matter where it's deployed.
-
-2. **Data was stored in memory** (`let properties = [...]`, `let appointments
-   = []`, and a `Set()` of login tokens). On Vercel, memory is wiped constantly
-   and isn't shared between server instances — so listings, bookings, and
-   admin sessions could all vanish unpredictably. Fixed by moving everything
-   to **Turso** (a free, hosted, SQLite-compatible database).
-
-3. **Login sessions** now use a signed, self-verifying token instead of an
-   in-memory list — nothing server-side can go missing between requests, so
-   login is reliable regardless of how many server instances Vercel is running.
-
-4. **Admin panel hidden from the public site** — the "⚙ Admin" link has been
-   removed from the main site's nav. The admin panel still lives at
-   `/admin.html`, it's just not linked anywhere — bookmark that URL.
-
-5. **Click-to-enlarge photos** — clicking any property photo (in the
-   Marketplace, inside a property's detail view, or in the "Our Work"
-   portfolio section) now opens it full-size in a lightbox viewer.
-
-6. **Share button fixed** — it now opens WhatsApp directly with a pre-filled
-   message and link, instead of relying on the browser's native Share API
-   (which wasn't reliably supported and is why it "did nothing" before).
-
-7. **`vercel.json` added** — this was missing before, which was part of why
-   the hardcoded-localhost bug was never caught during deployment.
-
-## Project Structure
+## Project structure
 ```
 midland/
-├── server.js          ← Main backend (Node.js + Express + Turso)
-├── vercel.json        ← Vercel serverless config
-├── package.json        ← Dependencies
-├── .env.example        ← Environment variable template
-└── public/
-    ├── index.html      ← Main website
-    └── admin.html      ← Admin dashboard (/admin.html — not linked publicly)
+├── server.js            ← API, security, server-rendered property pages, sitemap
+├── lib/price.js         ← price parsing/formatting (PKR crore / lac)
+├── views/
+│   ├── pages.js         ← property detail page + 404 (server-rendered for SEO / WhatsApp previews)
+│   └── legal.js         ← privacy policy + terms (have these reviewed by your lawyer)
+├── public/
+│   ├── index.html       ← homepage
+│   ├── admin.html       ← admin panel (at /admin, not linked publicly)
+│   └── assets/
+│       ├── site.css     ← all public-site styles
+│       ├── app.js       ← shared JS: nav, booking form, cards, lightbox, favourites
+│       ├── home.js      ← homepage: search/filters, featured listing, portfolio, testimonials
+│       ├── admin.js     ← admin panel logic
+│       ├── icons.svg    ← SVG icon set
+│       └── logo.jpg, placeholder.svg
+├── vercel.json
+└── .env.example
 ```
 
-## Quick Start (Local)
-
-### 1. Install Node.js
-Download from https://nodejs.org (v18+ recommended)
-
-### 2. Install Dependencies
+## Run locally
 ```bash
 npm install
+cp .env.example .env     # optional for local dev
+npm run dev
 ```
+- Website: http://localhost:3001 · Admin: http://localhost:3001/admin
+- Without `.env`, a local `db.sqlite` file is used and, if no admin exists yet, a random admin password is printed in the terminal once.
 
-### 3. Start the Server
-```bash
-npm start
-```
-Without any `.env` file, this uses a local SQLite file (`db.sqlite`) —
-perfect for testing on your own machine.
+## Deploy to Vercel
+1. Create a free database at https://turso.tech → copy the **Database URL** and an **Auth Token**.
+2. In Vercel → Project → Settings → Environment Variables, add:
 
-### 4. Open in Browser
-- Website: http://localhost:3001
-- Admin panel: http://localhost:3001/admin.html
+| Variable | Required | Notes |
+|---|---|---|
+| `SESSION_SECRET` | ✅ | 64 hex chars: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"` — the server refuses to start without it |
+| `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN` | ✅ | otherwise data is wiped on every deploy |
+| `ADMIN_PASS` | first deploy | only used if no admin account exists yet |
+| `SITE_URL` | recommended | e.g. `https://midland-pi.vercel.app` (used in sitemap & share links) |
+| `WHATSAPP_NUMBER`, `CONTACT_PHONE`, `CONTACT_EMAIL`, `CONTACT_ADDRESS` | recommended | shown everywhere on the site — **replace the placeholder number** |
 
-### Default Admin Credentials
-- Username: `admin`
-- Password: `midland2025`
-⚠️ Change your password immediately after first login — call
-`PATCH /api/admin/change-password` with your current + new password
-(headers: `x-admin-token: <your login token>`).
+3. Redeploy, open `/admin`, log in, then **Settings → Change password**.
+4. Check `/api/health` → `"persistentDb": true`.
 
----
-
-## Deploying to Vercel (with persistent data)
-
-### Step 1 — Create a free Turso database
-1. Go to https://turso.tech and sign up (free tier is plenty for this site).
-2. Create a new database (any name, e.g. `midland`).
-3. Copy the **Database URL** (`libsql://...`) and create + copy an **Auth Token**.
-
-### Step 2 — Set environment variables in Vercel
-In your Vercel project → Settings → Environment Variables, add:
-```
-TURSO_DATABASE_URL   = libsql://your-db-name.turso.io
-TURSO_AUTH_TOKEN     = your-token-here
-SESSION_SECRET       = (a long random string — generate with the command below)
-```
-Generate a `SESSION_SECRET` locally:
-```bash
-node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
-```
-
-### Step 3 — Deploy
-Push this folder to GitHub and import it into Vercel (Framework Preset:
-"Other" — the included `vercel.json` tells Vercel how to run `server.js`).
-
-### Step 4 — First login
-Visit `https://your-site.vercel.app/admin.html` and log in with `admin` /
-`midland2025`, then change the password right away.
-
----
+> Upgrading an existing database? Nothing to do — new columns (`images`, `price_pkr`, `city`) are added and filled in automatically on first start.
 
 ## Features
+**Website**
+- Property search: Sale / Rent / Saved tabs, text search, city, category, bedrooms, budget, sorting — filters are kept in the URL so searches can be shared
+- Featured listing slideshow (from your newest listing, with pause control)
+- A page per listing at `/property/S0001` with photo gallery + lightbox, specs, map, booking form, similar listings, WhatsApp share with rich preview (Open Graph) and Google structured data
+- Booking form with inline validation (no past dates, closed Sundays), clear error messages, and a confirmation screen with reference number, “Add to Google Calendar” and WhatsApp
+- Favourites saved in the visitor's browser
+- `sitemap.xml`, `robots.txt`, privacy & terms pages, real 404 page
+- Accessible: keyboard navigation, focus states, screen-reader labels, readable contrast, reduced-motion support
 
-### Website (`index.html`)
-- 🖼️ Featured listing photo slideshow
-- 🏘️ Property Marketplace — filter by For Sale / For Rent, detail modal, favourites
-- 🔍 **Click any property or portfolio photo to view it full-size**
-- 📅 Appointment booking, synced to the backend
-- 🏗️ Portfolio ("Our Work") section
-- 💬 WhatsApp floating contact button, and WhatsApp share on any property
-- 📱 Fully responsive
+**Admin (`/admin`)**
+- Dashboard, add **and edit** every field of a listing, multiple photos per listing, mark sold/rented/re-list, delete
+- Appointments: Pending / Confirmed / Past / All, confirm or reschedule via WhatsApp, CSV export, “Delete all” protected by typing `DELETE ALL`
+- Calendar of confirmed appointments
+- Change password; automatic logout after 30 minutes idle
 
-### Admin Panel (`admin.html` — not linked from the public site)
-- 🔐 Secure login, session auto-clears when you leave the tab
-- 📊 Dashboard with live stats
-- ➕ Add / manage property listings
-- 📅 Appointments manager with WhatsApp confirm/reschedule messaging
-- 🗓️ Calendar view of confirmed appointments
+## Security
+- Admin tokens are HMAC-signed and expire after 12 h; no default secret or password exists in code
+- Rate limiting on login (5 failed attempts / 15 min) and bookings (5 / hour per IP)
+- All user input is validated server-side and escaped before display (admin panel included)
+- No CORS: the API can only be called from the site itself
+- Security headers (`nosniff`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`)
 
-## 🌐 API Endpoints
+## Editing site content
+- **Completed projects & testimonials:** top of `public/assets/home.js` (`PROJECTS`, `TESTIMONIALS`). The testimonials section stays hidden until you add real reviews.
+- **Photos:** paste image links (one per line) in Admin → Edit property. Upload photos to Cloudinary or similar first.
 
-### Public
-| Method | Endpoint           | Description               |
-|--------|--------------------|---------------------------|
-| GET    | /api/properties    | List available properties |
-| POST   | /api/appointments  | Book an appointment       |
-
-### Admin (requires `x-admin-token` header)
-| Method | Endpoint                      | Description                    |
-|--------|-------------------------------|--------------------------------|
-| POST   | /api/admin/login              | Login, returns session token   |
-| POST   | /api/admin/logout             | Logout                         |
-| PATCH  | /api/admin/change-password    | Change admin password          |
-| GET    | /api/admin/properties         | List ALL properties            |
-| POST   | /api/admin/properties         | Add new property               |
-| PATCH  | /api/admin/properties/:id     | Update a property               |
-| DELETE | /api/admin/properties/:id     | Delete a property               |
-| GET    | /api/admin/appointments       | List all appointments          |
-| PATCH  | /api/admin/appointments/:id   | Update appointment (confirm)   |
-| DELETE | /api/admin/appointments/:id   | Delete single appointment      |
-| DELETE | /api/admin/appointments       | Clear all appointments         |
-| GET    | /api/admin/stats              | Dashboard statistics           |
-
-## 📱 WhatsApp Setup
-Before going live, replace the phone number used by the floating WhatsApp
-button in `public/index.html` (`https://wa.me/923001234567?...`) with your own
-WhatsApp Business number (country code, no `+`).
-
-## 🔒 Security Notes
-- Admin sessions live in `sessionStorage`, cleared when the tab closes or loses focus
-- Never commit your `.env` file — it's in `.gitignore` by default
-- Change the default admin credentials right after your first deploy
+## API
+Public: `GET /api/properties`, `GET /api/properties/:id`, `POST /api/appointments`, `GET /api/config`, `GET /api/health`
+Admin (`x-admin-token` header): `POST /api/admin/login`, `POST /api/admin/logout`, `PATCH /api/admin/change-password`, `GET|POST /api/admin/properties`, `PATCH|DELETE /api/admin/properties/:id`, `GET /api/admin/appointments`, `PATCH|DELETE /api/admin/appointments/:id`, `DELETE /api/admin/appointments` (body `{"confirm":"DELETE ALL"}`), `GET /api/admin/stats`

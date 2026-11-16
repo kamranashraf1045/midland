@@ -211,6 +211,91 @@
     $$('.count').forEach(c => io.observe(c));
   }
 
+  // ─── HERO SKYLINE + CRANE ANIMATION ─────────────────────────────────────────
+  // Draws an SVG city skyline (buildings rise, windows light up) with a tower crane
+  // carrying a load to a building going up floor by floor. Seeded, so it looks the same every visit.
+  function buildSkyline() {
+    const host = $('#skyline'); if (!host) return;
+    let seed = 1995; const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+    const W = 1440, H = 300, GROUND = H, SITE = [840, 985]; // SITE = gap for the construction site
+    const r = (n) => Math.round(n * 10) / 10;
+    let back = '', front = '', wins = '';
+
+    // back layer: lighter, no windows
+    for (let x = -10; x < W; ) {
+      const w = 38 + rnd() * 60, h = 70 + rnd() * 130;
+      back += `<rect class="bld" style="--d:${r(.1 + x / W * .9)}s" x="${r(x)}" y="${r(GROUND - h)}" width="${r(w)}" height="${r(h)}"/>`;
+      if (rnd() > .7) back += `<rect class="bld" style="--d:${r(.1 + x / W * .9)}s" x="${r(x + w / 2 - 2)}" y="${r(GROUND - h - 18)}" width="4" height="18"/>`;
+      x += w + 2 + rnd() * 6;
+    }
+    // front layer: darker silhouettes with lit windows
+    let tallest = { h: 0 };
+    for (let x = -6; x < W; ) {
+      if (x > SITE[0] - 30 && x < SITE[1]) { x = SITE[1] + 4; continue; }
+      const w = 44 + rnd() * 52, h = 55 + rnd() * (x > 560 && x < 1300 ? 150 : 95);
+      const d = .35 + x / W * 1.1, y = GROUND - h;
+      const roof = rnd();
+      front += `<g class="bld" style="--d:${r(d)}s"><rect x="${r(x)}" y="${r(y)}" width="${r(w)}" height="${r(h)}"/>` +
+        (roof > .78 ? `<path d="M${r(x)} ${r(y)} L${r(x + w / 2)} ${r(y - 16)} L${r(x + w)} ${r(y)}Z"/>` : roof > .6 ? `<rect x="${r(x + 6)}" y="${r(y - 8)}" width="${r(w - 12)}" height="8"/>` : '') + '</g>';
+      if (h > tallest.h) tallest = { h, x: x + w / 2, y };
+      // no lit windows behind the hero text/stats on the left, where they'd hurt readability
+      const cols = x < 700 ? 0 : Math.floor((w - 10) / 11), rows = Math.floor((h - 16) / 15);
+      for (let c = 0; c < cols; c++) for (let rr = 0; rr < rows; rr++) {
+        if (rnd() > .26) continue;
+        wins += `<rect class="win" style="--d:${r(d + 1.1 + rnd() * 2.5)}s;--tw:${r(5 + rnd() * 9)}s" x="${r(x + 7 + c * 11)}" y="${r(y + 10 + rr * 15)}" width="4.5" height="7" rx=".8"/>`;
+      }
+      x += w + 3 + rnd() * 10;
+    }
+    // building under construction: floors stack one by one
+    let floors = '';
+    for (let i = 0; i < 6; i++) {
+      const fy = GROUND - (i + 1) * 17;
+      floors += `<g class="floor" style="--d:${r(1.8 + i * .45)}s"><rect x="870" y="${fy}" width="96" height="17"/>` +
+        `<path d="M870 ${fy + 17} L894 ${fy} M894 ${fy + 17} L918 ${fy} M918 ${fy + 17} L942 ${fy} M942 ${fy + 17} L966 ${fy}"/></g>`;
+    }
+    // tower crane: lattice mast, jib, counter-jib, trolley with swaying hoist
+    const MX = 1012, TOP = 108; // low enough to stay below the featured-listing card
+    let lattice = '';
+    for (let y = GROUND; y > TOP + 14; y -= 16) lattice += `M${MX - 8} ${y} L${MX + 8} ${y - 16} M${MX + 8} ${y} L${MX - 8} ${y - 16} `;
+    let jibLat = '';
+    for (let x = MX - 200; x < MX + 70; x += 14) jibLat += `M${x} ${TOP + 14} L${x + 7} ${TOP + 4} L${x + 14} ${TOP + 14} `;
+    const crane = `<g class="crane">
+      <path class="steel" d="M${MX - 8} ${GROUND} V${TOP + 14} M${MX + 8} ${GROUND} V${TOP + 14} ${lattice}"/>
+      <path class="steel" d="M${MX - 200} ${TOP + 14} H${MX + 70} M${MX - 200} ${TOP + 4} H${MX + 70} ${jibLat}"/>
+      <path class="steel" d="M${MX} ${TOP - 18} L${MX - 200} ${TOP + 4} M${MX} ${TOP - 18} L${MX + 70} ${TOP + 4} M${MX - 8} ${TOP + 4} L${MX} ${TOP - 18} L${MX + 8} ${TOP + 4}"/>
+      <rect class="cab" x="${MX + 4}" y="${TOP + 14}" width="18" height="14" rx="2"/>
+      <rect class="weight" x="${MX + 40}" y="${TOP + 14}" width="26" height="18"/>
+      <circle class="beacon" cx="${MX}" cy="${TOP - 20}" r="3"/>
+      <g class="trolley"><rect class="cab" x="${MX - 64}" y="${TOP + 13}" width="14" height="6"/>
+        <g class="hoist"><line class="cable" x1="${MX - 57}" y1="${TOP + 19}" x2="${MX - 57}" y2="${TOP + 50}"/>
+          <g class="load"><path class="steel" d="M${MX - 63} ${TOP + 50} L${MX - 57} ${TOP + 44} L${MX - 51} ${TOP + 50}"/>
+          <rect class="beam" x="${MX - 85}" y="${TOP + 50}" width="56" height="8" rx="1"/></g></g></g>
+    </g>`;
+    const beacon = tallest.h ? `<line class="steel" x1="${r(tallest.x)}" y1="${r(tallest.y)}" x2="${r(tallest.x)}" y2="${r(tallest.y - 26)}"/><circle class="beacon" cx="${r(tallest.x)}" cy="${r(tallest.y - 28)}" r="2.6"/>` : '';
+
+    host.innerHTML = `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMax slice">
+      <style>
+        .back rect{fill:#24506a;opacity:.45}.front .bld{fill:#0b2130}.win{fill:#e2c47a}
+        .floor rect{fill:rgba(201,168,76,.08);stroke:rgba(201,168,76,.55);stroke-width:1.2}.floor path{stroke:rgba(201,168,76,.35);stroke-width:.8;fill:none}
+        .steel{stroke:#c9a84c;stroke-width:1.4;fill:none;opacity:.8}.cable{stroke:#c9a84c;stroke-width:1;opacity:.8}
+        .cab,.weight{fill:#c9a84c;opacity:.85}.beam{fill:#e2c47a}.beacon{fill:#ff5a4f}
+      </style>
+      <g class="layer back" data-depth=".06">${back}</g>
+      <g class="layer front" data-depth=".12">${front}${wins}${floors}${crane}${beacon}<rect x="0" y="${H - 2}" width="${W}" height="2" fill="#c9a84c" opacity=".35"/></g>
+    </svg>`;
+
+    // gentle parallax while scrolling past the hero
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const layers = $$('.layer', host);
+    let ticking = false;
+    addEventListener('scroll', () => {
+      if (ticking || scrollY > innerHeight * 1.2) return;
+      ticking = true;
+      requestAnimationFrame(() => { layers.forEach(l => l.setAttribute('transform', `translate(0 ${r(scrollY * l.dataset.depth)})`)); ticking = false; });
+    }, { passive: true });
+  }
+
+  buildSkyline();
   applyStateToControls();
   renderPortfolio(); renderTestimonials(); animateCounters(); load();
 })();

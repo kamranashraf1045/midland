@@ -2,992 +2,240 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MidLand Constructions – Building Dreams Since 1995</title>
-<meta name="description" content="Premier real estate and construction company in Lahore, Pakistan. Luxury homes, apartments, and commercial properties for sale and rent.">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MidLand Constructions – Real Estate & Construction in Pakistan since 1995</title>
+<meta name="description" content="Homes, apartments and commercial property for sale and rent in Lahore, Islamabad and Karachi — plus construction services from MidLand Constructions, building since 1995.">
+<meta name="theme-color" content="#0f2530">
+<link rel="icon" href="/assets/logo.jpg">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="MidLand Constructions">
+<meta property="og:title" content="MidLand Constructions – Building Dreams Since 1995">
+<meta property="og:description" content="Browse homes, apartments and commercial property for sale and rent, and book a viewing online.">
+<meta property="og:image" content="https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=1200&q=75&auto=format&fit=crop">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
-<style>
-:root {
-  --teal:#1a3a4a; --teal-dark:#0f2530; --teal-mid:#1e4a5e;
-  --gold:#c9a84c; --gold-light:#e2c47a; --gold-pale:#f5edd8;
-  --cream:#f8f4ee; --white:#fff;
-  --text-dark:#1a2630; --text-mid:#4a6070; --text-light:#8a9fac;
-  --border:#e2ddd5;
-  --shadow:0 8px 40px rgba(26,58,74,.12);
-  --shadow-lg:0 20px 80px rgba(26,58,74,.18);
-}
-*{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text-dark);overflow-x:hidden}
-::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--cream)}::-webkit-scrollbar-thumb{background:var(--gold);border-radius:3px}
-
-/* LOADER */
-#loader{position:fixed;inset:0;z-index:99998;background:var(--teal-dark);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:20px;transition:opacity .7s,visibility .7s}
-#loader.hidden{opacity:0;visibility:hidden;pointer-events:none}
-.loader-logo{font-family:'Cormorant Garamond',serif;font-size:46px;color:var(--gold);font-weight:300;letter-spacing:6px;animation:pulse 1.5s ease-in-out infinite alternate}
-@keyframes pulse{from{opacity:.7}to{opacity:1}}
-.loader-sub{font-size:12px;color:rgba(255,255,255,.4);letter-spacing:3px;text-transform:uppercase}
-.loader-bar{width:220px;height:2px;background:rgba(255,255,255,.1);border-radius:1px;overflow:hidden;margin-top:8px}
-.loader-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-light));animation:fill 1.8s ease forwards}
-@keyframes fill{from{width:0}to{width:100%}}
-
-/* NAV */
-nav{position:fixed;top:0;left:0;right:0;z-index:1000;display:flex;align-items:center;justify-content:space-between;padding:0 60px;height:72px;background:rgba(15,37,48,.97);backdrop-filter:blur(20px);border-bottom:1px solid rgba(201,168,76,.2);transition:box-shadow .3s}
-.nav-logo{display:flex;align-items:center;gap:12px;text-decoration:none;cursor:pointer}
-.nav-logo-icon{width:42px;height:42px;background:var(--gold);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-weight:700;font-size:16px;color:var(--teal-dark)}
-.nav-logo-text .name{color:white;font-weight:600;font-size:15px}
-.nav-logo-text .tagline{color:var(--gold);font-size:11px;opacity:.8}
-.nav-links{display:flex;align-items:center;gap:6px}
-.nav-links a{color:rgba(255,255,255,.75);text-decoration:none;font-size:14px;padding:8px 16px;border-radius:6px;transition:all .2s;cursor:pointer}
-.nav-links a:hover{color:white;background:rgba(255,255,255,.08)}
-.nav-links a.active{color:var(--gold)}
-.nav-cta{background:var(--gold)!important;color:var(--teal-dark)!important;font-weight:600!important;padding:10px 22px!important;border-radius:8px!important}
-.nav-cta:hover{background:var(--gold-light)!important}
-.admin-link{color:rgba(255,255,255,.35)!important;font-size:12px!important;border:1px solid rgba(255,255,255,.1)!important;border-radius:6px}
-.admin-link:hover{color:var(--gold)!important;border-color:rgba(201,168,76,.4)!important}
-.mobile-menu-btn{display:none;background:none;border:none;color:white;font-size:22px;cursor:pointer;padding:8px}
-
-/* HERO */
-#home{min-height:100vh;background:linear-gradient(135deg,#0a1e2e 0%,#1a3a4a 40%,#1e4a5e 70%,#0f2530 100%);position:relative;overflow:hidden;display:flex;align-items:center}
-
-.hero-grid{position:absolute;inset:0;opacity:.025;background-image:linear-gradient(rgba(255,255,255,.6) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.6) 1px,transparent 1px);background-size:60px 60px}
-.hero-glow{position:absolute;top:20%;left:15%;width:500px;height:500px;background:radial-gradient(circle,rgba(201,168,76,.07) 0%,transparent 70%);pointer-events:none}
-.hero-content{position:relative;z-index:2;max-width:1300px;margin:0 auto;padding:100px 60px 80px;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;width:100%}
-.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.25);padding:7px 18px;border-radius:100px;margin-bottom:28px;font-size:11px;color:var(--gold);letter-spacing:2px;text-transform:uppercase;animation:fadeInDown .8s ease both}
-.hero-badge::before{content:'';width:6px;height:6px;background:var(--gold);border-radius:50%;animation:blink 2s ease-in-out infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
-.hero-h1{font-family:'Cormorant Garamond',serif;font-size:clamp(50px,5.5vw,80px);font-weight:300;line-height:1.06;color:white;margin-bottom:24px;animation:fadeInUp .9s .2s ease both}
-.hero-h1 em{font-style:italic;color:var(--gold);font-weight:400}
-.hero-desc{color:rgba(255,255,255,.58);font-size:16px;line-height:1.75;max-width:460px;margin-bottom:44px;animation:fadeInUp .9s .35s ease both}
-.hero-actions{display:flex;gap:16px;flex-wrap:wrap;animation:fadeInUp .9s .5s ease both}
-.btn-primary{background:var(--gold);color:var(--teal-dark);padding:14px 32px;border-radius:10px;font-size:14px;font-weight:600;border:none;cursor:pointer;transition:all .3s;text-decoration:none;display:inline-block;letter-spacing:.3px}
-.btn-primary:hover{background:var(--gold-light);transform:translateY(-2px);box-shadow:0 8px 30px rgba(201,168,76,.4)}
-.btn-outline{background:transparent;color:white;padding:13px 32px;border-radius:10px;font-size:14px;border:1px solid rgba(255,255,255,.25);cursor:pointer;transition:all .3s;text-decoration:none;display:inline-block}
-.btn-outline:hover{border-color:rgba(255,255,255,.6);background:rgba(255,255,255,.06)}
-.hero-stats{display:flex;gap:44px;margin-top:56px;padding-top:40px;border-top:1px solid rgba(255,255,255,.1);animation:fadeInUp .9s .65s ease both}
-.hero-stat .num{font-family:'Cormorant Garamond',serif;font-size:38px;font-weight:600;color:var(--gold);line-height:1}
-.hero-stat .lbl{font-size:11px;color:rgba(255,255,255,.45);margin-top:4px;letter-spacing:.5px}
-
-/* FEATURED LISTING GALLERY */
-.hero-visual{position:relative;display:flex;justify-content:center;align-items:center;animation:fadeInRight 1s .3s ease both}
-.villa-gallery{position:relative;width:100%;max-width:540px}
-.villa-slides{position:relative;border-radius:20px;overflow:hidden;box-shadow:0 40px 80px rgba(0,0,0,.55);aspect-ratio:4/3}
-.villa-slide{position:absolute;inset:0;opacity:0;transition:opacity .9s ease}
-.villa-slide.active{opacity:1}
-.villa-slide img{width:100%;height:100%;object-fit:cover;display:block}
-.villa-slide::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(10,30,46,.6) 0%,transparent 50%)}
-.villa-dots{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);display:flex;gap:7px;z-index:5}
-.vdot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.35);cursor:pointer;transition:all .3s;border:none;padding:0}
-.vdot.active{background:var(--gold);width:22px;border-radius:4px}
-.villa-nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.12);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.2);color:white;width:36px;height:36px;border-radius:50%;font-size:16px;cursor:pointer;z-index:5;display:flex;align-items:center;justify-content:center;transition:all .2s}
-.villa-nav:hover{background:rgba(255,255,255,.25)}
-.villa-nav.prev{left:12px}
-.villa-nav.next{right:12px}
-/* Floating badge cards */
-.house-badge-1{position:absolute;bottom:-16px;right:-20px;z-index:10;background:rgba(15,37,48,.92);backdrop-filter:blur(20px);border:1px solid rgba(201,168,76,.25);border-radius:16px;padding:16px 20px;color:white}
-.house-badge-2{position:absolute;top:-16px;left:-16px;z-index:10;background:var(--gold);color:var(--teal-dark);border-radius:14px;padding:14px 18px;text-align:center;box-shadow:0 10px 36px rgba(201,168,76,.45)}
-.badge-price{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--gold)}
-.badge-label{font-size:10px;opacity:.6;margin-bottom:3px;letter-spacing:1px;text-transform:uppercase}
-.badge-name{font-size:12px;opacity:.8;margin-top:3px}
-.badge-tag{display:inline-block;background:rgba(201,168,76,.25);border:1px solid rgba(201,168,76,.4);color:var(--gold);font-size:9px;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:1.5px;margin-top:8px}
-.badge2-num{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:700;color:var(--teal-dark)}
-.badge2-lbl{font-size:11px;color:var(--teal-dark);font-weight:600}
-
-/* SECTIONS */
-section{padding:100px 60px}
-.container{max-width:1300px;margin:0 auto}
-.section-label{font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:16px;display:flex;align-items:center;gap:10px}
-.section-label::before{content:'';width:30px;height:1px;background:var(--gold)}
-.section-h2{font-family:'Cormorant Garamond',serif;font-size:clamp(34px,3.5vw,54px);font-weight:400;line-height:1.1;color:var(--text-dark)}
-.section-h2 em{font-style:italic;color:var(--teal)}
-.section-desc{color:var(--text-mid);font-size:16px;line-height:1.75;max-width:520px;margin-top:16px}
-
-/* PORTFOLIO */
-#portfolio{background:var(--white)}
-.portfolio-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:56px;flex-wrap:wrap;gap:24px}
-.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:56px}
-.stat-box{background:white;padding:36px 28px;display:flex;flex-direction:column;align-items:center;text-align:center;transition:all .3s;position:relative;overflow:hidden}
-.stat-box::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(201,168,76,.04) 0%,transparent 60%);opacity:0;transition:opacity .3s}
-.stat-box:hover{background:var(--cream);transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,.08)}
-.stat-box:hover::before{opacity:1}
-.stat-icon{width:56px;height:56px;background:var(--gold-pale);border-radius:16px;display:flex;align-items:center;justify-content:center;margin-bottom:18px;font-size:24px;transition:transform .3s;box-shadow:0 4px 16px rgba(201,168,76,.15)}
-.stat-box:hover .stat-icon{transform:scale(1.12) rotate(-4deg)}
-.stat-num{font-family:'Cormorant Garamond',serif;font-size:52px;font-weight:700;color:var(--teal);line-height:1;display:flex;align-items:baseline;gap:2px}
-.stat-num .counter-val{display:inline-block}
-.stat-num .counter-suffix{font-size:36px;color:var(--gold)}
-.stat-lbl{font-size:13px;color:var(--text-light);margin-top:8px;font-weight:500;letter-spacing:.03em}
-.stat-bar{width:40px;height:2px;background:linear-gradient(90deg,var(--gold),transparent);margin-top:10px;border-radius:2px;transform:scaleX(0);transform-origin:left;transition:transform .6s .2s}
-.portfolio-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
-.portfolio-card{border-radius:16px;overflow:hidden;border:1px solid var(--border);background:white;transition:all .35s;cursor:pointer}
-.portfolio-card:hover{transform:translateY(-8px);box-shadow:var(--shadow-lg)}
-.pc-img{height:240px;position:relative;overflow:hidden}
-.pc-img img{width:100%;height:100%;object-fit:cover;transition:transform .55s}
-.portfolio-card:hover .pc-img img{transform:scale(1.08)}
-.pc-badge{position:absolute;top:14px;right:14px;background:var(--gold);color:var(--teal-dark);font-size:10px;font-weight:700;letter-spacing:1px;padding:5px 12px;border-radius:6px;text-transform:uppercase}
-.pc-body{padding:20px 22px 22px}
-.pc-body h3{font-size:17px;font-weight:600;margin-bottom:6px}
-.pc-body .loc{font-size:13px;color:var(--text-light)}
-.pc-body .year{font-size:12px;color:var(--teal);margin-top:8px;font-weight:500}
-
-/* PROPERTIES */
-#properties{background:var(--cream)}
-.prop-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:40px;flex-wrap:wrap;gap:20px}
-.prop-filters{display:flex;gap:8px;flex-wrap:wrap}
-.filter-btn{padding:9px 22px;border-radius:8px;font-size:13px;font-weight:500;border:1.5px solid var(--border);background:white;color:var(--text-mid);cursor:pointer;transition:all .2s}
-.filter-btn:hover{border-color:var(--gold);color:var(--teal)}
-.filter-btn.active{background:var(--teal);border-color:var(--teal);color:white}
-.prop-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
-.prop-card{border-radius:16px;overflow:hidden;background:white;border:1px solid var(--border);transition:all .35s;cursor:pointer}
-.prop-card:hover{transform:translateY(-8px);box-shadow:var(--shadow-lg)}
-.prop-img{height:220px;position:relative;overflow:hidden}
-.prop-img img{width:100%;height:100%;object-fit:cover;transition:transform .55s}
-.prop-card:hover .prop-img img{transform:scale(1.08)}
-.prop-tag{position:absolute;top:14px;left:14px;background:var(--gold);color:var(--teal-dark);font-size:10px;font-weight:700;letter-spacing:1px;padding:5px 12px;border-radius:6px;text-transform:uppercase}
-.prop-fav{position:absolute;top:14px;right:14px;width:34px;height:34px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;transition:all .2s;border:none;box-shadow:0 2px 10px rgba(0,0,0,.15)}
-.prop-fav:hover{background:var(--gold-pale);transform:scale(1.1)}
-.prop-fav.liked{color:#e74c3c}
-.prop-body{padding:18px 20px 20px}
-.prop-body h3{font-size:17px;font-weight:600;margin-bottom:4px}
-.prop-loc{font-size:12px;color:var(--text-light);margin-bottom:14px;display:flex;align-items:center;gap:4px}
-.prop-features{display:flex;gap:18px;padding:12px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin-bottom:14px}
-.prop-feat{font-size:12px;color:var(--text-mid);display:flex;align-items:center;gap:5px}
-.prop-footer{display:flex;align-items:center;justify-content:space-between}
-.prop-price{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--teal)}
-.prop-price small{font-family:'DM Sans',sans-serif;font-size:11px;color:var(--text-light);font-weight:400;display:block}
-.prop-cta{padding:8px 18px;border-radius:8px;font-size:12px;font-weight:600;background:var(--teal);color:white;border:none;cursor:pointer;transition:all .2s}
-.prop-cta:hover{background:var(--teal-mid);transform:translateY(-1px)}
-.no-props{display:none;text-align:center;padding:70px;color:var(--text-light)}
-.no-props-icon{font-size:48px;margin-bottom:14px}
-
-/* WHY US STRIP */
-#why-us{background:var(--teal-dark);padding:80px 60px}
-.why-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:32px;max-width:1300px;margin:0 auto}
-.why-card{text-align:center;padding:36px 24px;border:1px solid rgba(201,168,76,.12);border-radius:20px;background:rgba(255,255,255,.03);backdrop-filter:blur(6px);transition:all .35s;cursor:default;position:relative;overflow:hidden}
-.why-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(201,168,76,.06) 0%,transparent 60%);opacity:0;transition:opacity .35s}
-.why-card:hover{transform:translateY(-6px);border-color:rgba(201,168,76,.4);background:rgba(255,255,255,.06)}
-.why-card:hover::before{opacity:1}
-.why-icon-wrap{position:relative;display:inline-flex;align-items:center;justify-content:center;margin-bottom:20px}
-.why-icon{width:64px;height:64px;background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.3);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:26px;transition:transform .35s;position:relative;z-index:1}
-.why-card:hover .why-icon{transform:scale(1.1) rotate(-5deg)}
-.why-icon-ring{position:absolute;inset:-6px;border:1.5px solid rgba(201,168,76,.2);border-radius:22px;opacity:0;transform:scale(.85);transition:all .4s}
-.why-card:hover .why-icon-ring{opacity:1;transform:scale(1)}
-.why-title{color:white;font-size:16px;font-weight:600;margin-bottom:10px;letter-spacing:.01em}
-.why-desc{color:rgba(255,255,255,.45);font-size:13px;line-height:1.75}
-.why-stat{margin-top:16px;padding-top:14px;border-top:1px solid rgba(201,168,76,.15);font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:700;color:var(--gold)}
-.why-stat span{font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;color:rgba(255,255,255,.4);margin-left:4px;vertical-align:middle}
-/* Marquee CTA */
-.marquee-cta{background:var(--gold);padding:16px 0;overflow:hidden;white-space:nowrap;margin-top:60px}
-.marquee-track{display:inline-flex;animation:marquee-scroll 30s linear infinite;white-space:nowrap}
-.marquee-track span{font-size:13px;font-weight:600;color:var(--teal-dark);letter-spacing:.04em;text-transform:uppercase}
-@keyframes marquee-scroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
-
-/* APPOINTMENT */
-#appointment{background:linear-gradient(135deg,#0a1e2e 0%,#1a3a4a 50%,#1e4a5e 100%);position:relative;overflow:hidden}
-#appointment::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle at 10% 50%,rgba(201,168,76,.07) 0%,transparent 50%),radial-gradient(circle at 90% 20%,rgba(201,168,76,.05) 0%,transparent 40%)}
-.appt-grid{display:grid;grid-template-columns:1fr 1.2fr;gap:80px;align-items:center;position:relative;z-index:1}
-.appt-left{color:white}
-.appt-why{margin-top:40px;display:flex;flex-direction:column;gap:22px}
-.appt-why-item{display:flex;gap:16px;align-items:flex-start}
-.appt-why-icon{width:44px;height:44px;background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.25);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
-.appt-why-text h4{color:white;font-size:15px;font-weight:600;margin-bottom:4px}
-.appt-why-text p{color:rgba(255,255,255,.45);font-size:13px;line-height:1.6}
-.appt-form-card{background:white;border-radius:24px;padding:44px;box-shadow:0 30px 80px rgba(0,0,0,.35)}
-.appt-form-card h3{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:400;margin-bottom:6px;color:var(--text-dark)}
-.appt-form-card>p{color:var(--text-light);font-size:13px;margin-bottom:28px}
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.form-group{margin-bottom:16px}
-.form-group label{font-size:11px;font-weight:700;color:var(--text-mid);letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px;display:block}
-.form-group input,.form-group select,.form-group textarea{width:100%;padding:12px 16px;border-radius:10px;border:1.5px solid var(--border);background:var(--cream);font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text-dark);transition:all .2s;outline:none}
-.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--teal);background:white;box-shadow:0 0 0 3px rgba(26,58,74,.07)}
-.form-group textarea{resize:none;height:90px}
-.btn-submit{width:100%;padding:15px;background:var(--teal);color:white;border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;transition:all .3s;margin-top:6px;letter-spacing:.3px}
-.btn-submit:hover{background:var(--teal-mid);transform:translateY(-1px);box-shadow:0 8px 30px rgba(26,58,74,.35)}
-.btn-submit:disabled{opacity:.6;cursor:not-allowed;transform:none}
-
-/* FOOTER */
-footer{background:var(--teal-dark);padding:70px 60px 40px}
-.footer-grid{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:48px;max-width:1300px;margin:0 auto 48px}
-.footer-brand .name{color:white;font-size:18px;font-weight:600;margin-bottom:4px}
-.footer-brand .tagline{color:var(--gold);font-size:12px;margin-bottom:16px;letter-spacing:.5px}
-.footer-brand p{font-size:13px;line-height:1.75;color:rgba(255,255,255,.45);max-width:280px}
-.footer-socials{display:flex;gap:10px;margin-top:20px}
-.social-btn{width:36px;height:36px;border-radius:8px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;transition:all .2s;text-decoration:none}
-.social-btn:hover{background:rgba(201,168,76,.2);border-color:rgba(201,168,76,.4)}
-.footer-col h4{color:white;font-size:14px;font-weight:600;margin-bottom:18px;letter-spacing:.3px}
-.footer-col a{display:block;font-size:13px;color:rgba(255,255,255,.45);text-decoration:none;margin-bottom:12px;transition:color .2s;cursor:pointer}
-.footer-col a:hover{color:var(--gold)}
-.footer-bottom{max-width:1300px;margin:0 auto;padding-top:28px;border-top:1px solid rgba(255,255,255,.07);display:flex;justify-content:space-between;font-size:12px;color:rgba(255,255,255,.3);flex-wrap:wrap;gap:10px}
-
-/* PROPERTY MODAL */
-.modal-overlay{display:none;position:fixed;inset:0;z-index:5000;background:rgba(8,20,30,.88);backdrop-filter:blur(10px);align-items:center;justify-content:center;padding:20px}
-.modal-overlay.open{display:flex}
-.modal{background:white;border-radius:22px;max-width:620px;width:100%;max-height:88vh;overflow-y:auto;padding:36px;position:relative;animation:modalIn .35s cubic-bezier(.34,1.56,.64,1)}
-@keyframes modalIn{from{opacity:0;transform:scale(.9) translateY(30px)}to{opacity:1;transform:scale(1) translateY(0)}}
-.modal-close{position:absolute;top:16px;right:16px;width:34px;height:34px;background:var(--cream);border:none;border-radius:50%;font-size:20px;cursor:pointer;color:var(--text-mid);transition:all .2s;display:flex;align-items:center;justify-content:center;line-height:1}
-.modal-close:hover{background:var(--border);color:var(--text-dark)}
-.modal-img{width:100%;height:280px;object-fit:cover;border-radius:14px;margin-bottom:20px;cursor:zoom-in}
-.lightbox-overlay{display:none;position:fixed;inset:0;z-index:6000;background:rgba(5,12,18,.95);align-items:center;justify-content:center;padding:30px}
-.lightbox-overlay.open{display:flex}
-.lightbox-inner{position:relative;max-width:min(1100px,92vw);max-height:90vh;display:flex;flex-direction:column;align-items:center}
-.lightbox-inner img{max-width:100%;max-height:80vh;object-fit:contain;border-radius:10px;box-shadow:0 30px 90px rgba(0,0,0,.5)}
-.lightbox-caption{color:rgba(255,255,255,.85);font-size:14px;margin-top:14px;text-align:center;letter-spacing:.02em}
-.lightbox-close{position:absolute;top:-46px;right:0;width:38px;height:38px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.25);border-radius:50%;color:white;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;transition:background .2s}
-.lightbox-close:hover{background:rgba(255,255,255,.2)}
-.prop-img{cursor:zoom-in}
-.pc-img{cursor:zoom-in}
-@media(max-width:600px){.lightbox-close{top:-42px;right:0}}
-.modal-tag{display:inline-block;background:var(--gold);color:var(--teal-dark);font-size:10px;font-weight:700;letter-spacing:1.5px;padding:5px 12px;border-radius:6px;text-transform:uppercase;margin-bottom:12px}
-.modal h2{font-family:'Cormorant Garamond',serif;font-size:28px;margin-bottom:6px;font-weight:400}
-.modal-loc{color:var(--text-light);font-size:14px;margin-bottom:14px}
-.modal-price{font-family:'Cormorant Garamond',serif;font-size:30px;color:var(--teal);font-weight:600;margin-bottom:20px}
-.modal-features{display:flex;gap:24px;padding:16px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin-bottom:18px;flex-wrap:wrap}
-.modal-feat{text-align:center;min-width:60px}
-.modal-feat .val{font-size:19px;font-weight:700;color:var(--teal)}
-.modal-feat .key{font-size:11px;color:var(--text-light);margin-top:2px}
-.modal-desc{color:var(--text-mid);font-size:14px;line-height:1.75;margin-bottom:22px}
-.modal-actions{display:flex;gap:12px}
-.modal-book{flex:1;padding:14px;background:var(--teal);color:white;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s}
-.modal-book:hover{background:var(--teal-mid)}
-.modal-share{padding:14px 18px;background:var(--cream);border:1.5px solid var(--border);border-radius:10px;font-size:14px;cursor:pointer;transition:all .2s;color:var(--text-mid)}
-.modal-share:hover{border-color:var(--gold);color:var(--gold)}
-
-/* TOAST */
-.toast{position:fixed;bottom:32px;right:32px;z-index:99999;background:var(--teal-dark);color:white;padding:14px 24px;border-radius:12px;font-size:14px;display:flex;align-items:center;gap:10px;box-shadow:0 12px 40px rgba(0,0,0,.3);transform:translateY(120px);opacity:0;transition:all .45s cubic-bezier(.175,.885,.32,1.275);min-width:220px;max-width:360px}
-.toast.show{transform:translateY(0);opacity:1}
-.toast-icon{font-size:18px;flex-shrink:0}
-
-/* BACK TO TOP */
-#back-top{position:fixed;bottom:32px;left:32px;z-index:900;width:44px;height:44px;background:var(--teal-dark);border:1px solid rgba(255,255,255,.1);color:white;border-radius:12px;font-size:18px;cursor:pointer;display:none;align-items:center;justify-content:center;transition:all .3s}
-#back-top.show{display:flex}
-#back-top:hover{background:var(--teal);transform:translateY(-2px)}
-
-/* WHATSAPP FLOAT */
-#wa-float{position:fixed;bottom:32px;right:32px;z-index:9000;display:flex;flex-direction:column;align-items:flex-end;gap:12px}
-#wa-btn{width:58px;height:58px;background:#25D366;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 24px rgba(37,211,102,.45);cursor:pointer;transition:all .35s;border:none;position:relative;text-decoration:none}
-#wa-btn:hover{transform:scale(1.1);box-shadow:0 10px 36px rgba(37,211,102,.6)}
-#wa-btn svg{width:30px;height:30px;fill:white}
-#wa-pulse{position:absolute;inset:-4px;border-radius:50%;border:3px solid #25D366;opacity:0;animation:waPulse 2.5s ease-out infinite}
-#wa-pulse2{position:absolute;inset:-4px;border-radius:50%;border:3px solid #25D366;opacity:0;animation:waPulse 2.5s 1.2s ease-out infinite}
-@keyframes waPulse{0%{transform:scale(1);opacity:.6}100%{transform:scale(1.7);opacity:0}}
-#wa-tooltip{background:var(--teal-dark);color:white;padding:10px 16px;border-radius:12px;font-size:13px;font-weight:500;white-space:nowrap;box-shadow:0 8px 28px rgba(0,0,0,.25);opacity:0;transform:translateX(10px);transition:all .3s;pointer-events:none;border:1px solid rgba(255,255,255,.08)}
-#wa-float:hover #wa-tooltip{opacity:1;transform:translateX(0)}
-#wa-tooltip strong{color:#25D366;display:block;font-size:12px;margin-bottom:2px;letter-spacing:.3px}
-
-/* SCROLL FX */
-.fade-up{opacity:0;transform:translateY(32px);transition:opacity .75s,transform .75s}
-.fade-up.visible{opacity:1;transform:translateY(0)}
-@keyframes fadeInUp{from{opacity:0;transform:translateY(32px)}to{opacity:1;transform:translateY(0)}}
-@keyframes fadeInDown{from{opacity:0;transform:translateY(-24px)}to{opacity:1;transform:translateY(0)}}
-@keyframes fadeInRight{from{opacity:0;transform:translateX(50px)}to{opacity:1;transform:translateX(0)}}
-
-/* RESPONSIVE */
-@media(max-width:1024px){
-  .hero-content{gap:50px}
-  .portfolio-grid,.prop-grid{grid-template-columns:1fr 1fr}
-  .why-grid{grid-template-columns:1fr 1fr;gap:24px}
-  .footer-grid{grid-template-columns:1fr 1fr}
-}
-@media(max-width:900px){
-  nav{padding:0 24px}
-  section{padding:70px 24px}
-  #why-us{padding:60px 24px}
-  footer{padding:60px 24px 36px}
-  .hero-content{grid-template-columns:1fr;padding:100px 24px 60px}
-  .hero-visual{display:none}
-  .appt-grid{grid-template-columns:1fr;gap:48px}
-  .stats-row{grid-template-columns:1fr 1fr}
-  .form-row{grid-template-columns:1fr}
-  .mobile-menu-btn{display:flex}
-  .nav-links{display:none;position:fixed;top:72px;left:0;right:0;background:var(--teal-dark);flex-direction:column;padding:16px;gap:4px;border-bottom:1px solid rgba(255,255,255,.08)}
-  .nav-links.open{display:flex}
-  .nav-links a{padding:12px 16px}
-}
-@media(max-width:600px){
-  .portfolio-grid,.prop-grid{grid-template-columns:1fr}
-  .stats-row{grid-template-columns:1fr}
-  .why-grid{grid-template-columns:1fr 1fr}
-  .footer-grid{grid-template-columns:1fr}
-  .hero-stats{gap:28px}
-  .modal{padding:24px}
-}
-</style>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://images.unsplash.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/site.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"RealEstateAgent","name":"MidLand Constructions","foundingDate":"1995","address":{"@type":"PostalAddress","streetAddress":"DHA Phase 6","addressLocality":"Lahore","addressCountry":"PK"},"openingHours":"Mo-Sa 09:00-19:00","areaServed":["Lahore","Islamabad","Karachi"]}
+</script>
 </head>
 <body>
+<a class="skip-link" href="#main">Skip to content</a>
 
-<!-- LOADER -->
-<div id="loader">
-  <div class="loader-logo">MidLand</div>
-  <div class="loader-sub">Building Dreams Since 1995</div>
-  <div class="loader-bar"><div class="loader-fill"></div></div>
-</div>
-
-<!-- TOAST -->
-<div class="toast" id="toast"><span class="toast-icon" id="toast-icon">✓</span><span id="toast-msg">Done!</span></div>
-
-<!-- BACK TO TOP -->
-<button id="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to top">↑</button>
-
-<!-- WHATSAPP FLOAT -->
-<div id="wa-float">
-  <div id="wa-tooltip"><strong>Chat with us</strong>Usually replies in minutes</div>
-  <a id="wa-btn"
-     href="https://wa.me/923001234567?text=Assalam%20o%20Alaikum!%20I%20visited%20your%20website%20and%20I%27m%20interested%20in%20a%20property.%20Can%20you%20help%20me%3F"
-     target="_blank" rel="noopener" title="Chat on WhatsApp">
-    <div id="wa-pulse"></div>
-    <div id="wa-pulse2"></div>
-    <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-      <path d="M16 .5C7.44.5.5 7.44.5 16c0 2.72.7 5.28 1.94 7.5L.5 31.5l8.24-1.9A15.45 15.45 0 0016 31.5C24.56 31.5 31.5 24.56 31.5 16S24.56.5 16 .5zm0 28.34a13.77 13.77 0 01-7.02-1.92l-.5-.3-5.18 1.2 1.24-5.03-.33-.52A13.84 13.84 0 1116 28.84zm7.58-10.35c-.41-.21-2.44-1.2-2.82-1.34-.38-.14-.65-.2-.93.21-.27.41-1.06 1.34-1.3 1.62-.24.27-.48.3-.89.1-.41-.21-1.74-.64-3.32-2.04-1.22-1.09-2.05-2.44-2.29-2.85-.24-.41-.03-.63.18-.84.19-.18.41-.48.62-.72.2-.24.27-.41.41-.69.14-.27.07-.52-.03-.72-.1-.21-.93-2.24-1.27-3.07-.34-.8-.68-.69-.93-.7h-.8c-.27 0-.72.1-1.1.52-.38.41-1.44 1.41-1.44 3.44s1.48 3.99 1.68 4.27c.21.27 2.9 4.43 7.03 6.21.98.42 1.75.68 2.35.87.99.31 1.89.27 2.6.16.79-.12 2.44-1 2.78-1.96.34-.96.34-1.79.24-1.96-.1-.17-.38-.27-.79-.48z"/>
-    </svg>
+<header class="nav" id="navbar">
+  <a class="brand" href="/" aria-label="MidLand Constructions — home">
+    <img class="brand-logo" src="/assets/logo.jpg" alt="" width="44" height="44">
+    <span><span class="brand-name">MidLand Constructions</span><br><span class="brand-tag">Building Dreams Since 1995</span></span>
   </a>
-</div>
+  <button class="menu-btn" aria-label="Menu" aria-expanded="false" aria-controls="nav-links"><svg class="ic" aria-hidden="true"><use href="/assets/icons.svg#menu"/></svg></button>
+  <nav aria-label="Main">
+    <ul class="nav-links" id="nav-links">
+      <li><a href="#properties">Properties</a></li>
+      <li><a href="#portfolio">Our Work</a></li>
+      <li><a href="#why-us">Why Us</a></li>
+      <li><a class="nav-cta" href="#appointment">Book a Visit</a></li>
+    </ul>
+  </nav>
+</header>
 
-<!-- PROPERTY MODAL -->
-<div class="modal-overlay" id="prop-modal">
-  <div class="modal">
-    <button class="modal-close" onclick="closeModal()">×</button>
-    <img class="modal-img" id="modal-img" src="" alt="" onclick="event.stopPropagation();openLightbox(this.src, document.getElementById('modal-title').textContent)" title="Click to view full size">
-    <div id="modal-tag" class="modal-tag"></div>
-    <h2 id="modal-title"></h2>
-    <div class="modal-loc" id="modal-loc"></div>
-    <div class="modal-price" id="modal-price"></div>
-    <div class="modal-features">
-      <div class="modal-feat"><div class="val" id="modal-beds"></div><div class="key">Bedrooms</div></div>
-      <div class="modal-feat"><div class="val" id="modal-baths"></div><div class="key">Bathrooms</div></div>
-      <div class="modal-feat"><div class="val" id="modal-area"></div><div class="key">Sqft</div></div>
-      <div class="modal-feat"><div class="val" id="modal-floor"></div><div class="key">Floor</div></div>
-    </div>
-    <p class="modal-desc" id="modal-desc"></p>
-    <div class="modal-actions">
-      <button class="modal-book" onclick="scrollToAppt()">📅 Book Appointment</button>
-      <button class="modal-share" onclick="shareProperty()">💬 Share on WhatsApp</button>
-    </div>
-  </div>
-</div>
-
-<!-- IMAGE LIGHTBOX (full-size photo viewer) -->
-<div class="lightbox-overlay" id="lightbox-overlay" onclick="if(event.target===this)closeLightbox()">
-  <div class="lightbox-inner">
-    <button class="lightbox-close" onclick="closeLightbox()">×</button>
-    <img id="lightbox-img" src="" alt="">
-    <div class="lightbox-caption" id="lightbox-caption"></div>
-  </div>
-</div>
-
-<!-- NAV -->
-<nav id="navbar">
-  <div class="nav-logo" onclick="showSection('home')">
-    <img src="data:image/jpeg;base64,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" 
-         alt="MidLand Constructions" 
-         style="height:46px;width:auto;object-fit:contain;border-radius:4px">
-    <div class="nav-logo-text">
-      <div class="name">MidLand Constructions</div>
-      <div class="tagline">Building Dreams Since 1995</div>
-    </div>
-  </div>
-  <button class="mobile-menu-btn" onclick="toggleMobileMenu()" id="menu-btn">☰</button>
-  <div class="nav-links" id="nav-links">
-    <a class="active" onclick="navTo('home')">Home</a>
-    <a onclick="navTo('portfolio')">Portfolio</a>
-    <a onclick="navTo('properties')">Properties</a>
-    <a onclick="navTo('why-us')">Why Us</a>
-    <a class="nav-cta" onclick="navTo('appointment')">Book Appointment</a>
-  </div>
-</nav>
-
-<!-- ═══════════════════ HERO ═══════════════════ -->
-<section id="home" style="padding:0">
-  <div class="hero-particles" id="hero-particles"></div>
-  <div class="hero-grid"></div>
-  <div class="hero-glow"></div>
-  <div class="hero-content">
-    <!-- LEFT -->
+<main id="main">
+<!-- ═══════════ HERO ═══════════ -->
+<section class="hero" id="home" aria-labelledby="hero-title">
+  <div class="hero-grid">
     <div>
-      <div class="hero-badge">Lahore's Premier Real Estate</div>
-      <h1 class="hero-h1">Building Your<br><em>Dream Home</em><br>Since 1995</h1>
-      <p class="hero-desc">Premier construction and real estate solutions across Pakistan. From luxury residences to commercial spaces, we bring your vision to life with unmatched craftsmanship and 25 years of trust.</p>
+      <div class="hero-badge">Real Estate & Construction · Pakistan</div>
+      <h1 id="hero-title">Building your<br><em>dream home</em><br>since 1995</h1>
+      <p class="hero-desc">Homes, apartments and commercial property for sale and rent across Lahore, Islamabad and Karachi — backed by 30 years of building experience, from site selection to handover.</p>
       <div class="hero-actions">
-        <button class="btn-primary" onclick="navTo('properties')">Explore Properties</button>
-        <button class="btn-outline" onclick="navTo('portfolio')">View Our Work</button>
+        <a class="btn btn-gold" href="#properties">Explore properties</a>
+        <a class="btn btn-ghost-light" href="#appointment">Book a consultation</a>
       </div>
-      
+      <form class="hero-search" id="hero-search" aria-label="Quick property search">
+        <label class="sr-only" for="hs-type">Listing type</label>
+        <select id="hs-type"><option value="all">Buy or rent</option><option value="FOR SALE">Buy</option><option value="FOR RENT">Rent</option></select>
+        <label class="sr-only" for="hs-city">City</label>
+        <select id="hs-city"><option value="">Any city</option></select>
+        <button class="btn btn-gold" type="submit"><svg class="ic" aria-hidden="true"><use href="/assets/icons.svg#search"/></svg> Search</button>
+      </form>
+      <div class="hero-stats">
+        <div class="hero-stat"><b>30+</b><span>Years building</span></div>
+        <div class="hero-stat"><b>150+</b><span>Projects delivered</span></div>
+        <div class="hero-stat"><b>200+</b><span>Properties rented</span></div>
+      </div>
     </div>
-    <!-- FEATURED VILLA GALLERY -->
-    <div class="hero-visual">
-      <div class="villa-gallery">
-        <div class="house-badge-2">
-          <div class="badge2-num">200+</div>
-          <div class="badge2-lbl">Properties Rented</div>
-        </div>
-        <div class="villa-slides" id="villa-slides">
-          <div class="villa-slide active"><img src="https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800&q=80" alt="Luxury Villa DHA Phase 6 - Front View" loading="eager"></div>
-          <div class="villa-slide"><img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800&q=80" alt="Luxury Villa DHA Phase 6 - Pool Area" loading="lazy"></div>
-          <div class="villa-slide"><img src="https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?w=800&q=80" alt="Luxury Villa DHA Phase 6 - Interior" loading="lazy"></div>
-          <div class="villa-slide"><img src="https://images.unsplash.com/photo-1567767292278-a4f21aa2d36e?w=800&q=80" alt="Luxury Villa DHA Phase 6 - Garden" loading="lazy"></div>
-        </div>
-        <button class="villa-nav prev" onclick="slideVilla(-1)">‹</button>
-        <button class="villa-nav next" onclick="slideVilla(1)">›</button>
-        <div class="villa-dots">
-          <button class="vdot active" onclick="goSlide(0)"></button>
-          <button class="vdot" onclick="goSlide(1)"></button>
-          <button class="vdot" onclick="goSlide(2)"></button>
-          <button class="vdot" onclick="goSlide(3)"></button>
-        </div>
-        <div class="house-badge-1">
-          <div class="badge-label">Featured Listing</div>
-          <div class="badge-price">PKR 8.5 Cr</div>
-          <div class="badge-name">Luxury Villa – DHA Phase 6</div>
-          <div class="badge-tag">FOR SALE</div>
-        </div>
-      </div>
+
+    <!-- Featured listing — filled from the newest live listing -->
+    <div class="featured" id="featured" aria-label="Featured listing">
+      <div class="featured-frame skeleton"><div class="card-media" style="position:absolute;inset:0;aspect-ratio:auto"></div></div>
     </div>
   </div>
 </section>
 
-<!-- ═══════════════════ PORTFOLIO ═══════════════════ -->
-<section id="portfolio">
+<!-- ═══════════ PROPERTIES ═══════════ -->
+<section id="properties" aria-labelledby="props-title">
   <div class="container">
-    <div class="portfolio-header">
+    <div class="section-head">
       <div>
-        <div class="section-label">Our Work</div>
-        <h2 class="section-h2">A Legacy of <em>Excellence</em></h2>
-        <p class="section-desc">Showcasing 30 years of construction and real estate mastery across Pakistan's most coveted locations.</p>
+        <div class="eyebrow">Marketplace</div>
+        <h2 class="h2" id="props-title">Find your next <em>property</em></h2>
+        <p class="lead">Every listing is verified by our team. Open any property for photos, details and a map, then book a viewing in under a minute.</p>
+      </div>
+      <div class="tabs" role="group" aria-label="Listing type">
+        <button class="tab" data-type="all" aria-pressed="true">All</button>
+        <button class="tab" data-type="FOR SALE" aria-pressed="false">For Sale</button>
+        <button class="tab" data-type="FOR RENT" aria-pressed="false">For Rent</button>
+        <button class="tab" data-type="saved" aria-pressed="false">Saved <span id="saved-count"></span></button>
       </div>
     </div>
-    <div class="stats-row fade-up" id="stats-row">
-      <div class="stat-box"><div class="stat-icon">🏗️</div><div class="stat-num"><span class="counter-val" data-target="150">0</span><span class="counter-suffix">+</span></div><div class="stat-lbl">Projects Completed</div><div class="stat-bar"></div></div>
-      <div class="stat-box"><div class="stat-icon">🏠</div><div class="stat-num"><span class="counter-val" data-target="500">0</span><span class="counter-suffix">+</span></div><div class="stat-lbl">Homes Sold</div><div class="stat-bar"></div></div>
-      <div class="stat-box"><div class="stat-icon">🔑</div><div class="stat-num"><span class="counter-val" data-target="200">0</span><span class="counter-suffix">+</span></div><div class="stat-lbl">Properties Rented</div><div class="stat-bar"></div></div>
-      <div class="stat-box"><div class="stat-icon">🏆</div><div class="stat-num"><span class="counter-val" data-target="25">0</span><span class="counter-suffix">+</span></div><div class="stat-lbl">Years Experience</div><div class="stat-bar"></div></div>
+
+    <form class="filters" id="filters" aria-label="Filter properties" onsubmit="return false">
+      <div class="field">
+        <label for="f-q">Search</label>
+        <div class="search-wrap"><svg class="ic" aria-hidden="true"><use href="/assets/icons.svg#search"/></svg><input id="f-q" name="q" type="search" placeholder="Area, title or ID (e.g. Gulberg, S0001)"></div>
+      </div>
+      <div class="field"><label for="f-city">City</label><select id="f-city" name="city"><option value="">All cities</option></select></div>
+      <div class="field"><label for="f-cat">Category</label>
+        <select id="f-cat" name="cat"><option value="">All</option><option>Residential</option><option>Apartment</option><option>Commercial</option><option>Plot</option></select></div>
+      <div class="field"><label for="f-beds">Bedrooms</label>
+        <select id="f-beds" name="beds"><option value="">Any</option><option value="1">1+</option><option value="2">2+</option><option value="3">3+</option><option value="4">4+</option><option value="5">5+</option></select></div>
+      <div class="field"><label for="f-max">Budget</label><select id="f-max" name="max"></select></div>
+      <div class="field"><label for="f-sort">Sort by</label>
+        <select id="f-sort" name="sort"><option value="new">Newest</option><option value="price-asc">Price: low to high</option><option value="price-desc">Price: high to low</option><option value="area-desc">Largest first</option></select></div>
+    </form>
+
+    <div class="results-bar">
+      <span id="results-count" aria-live="polite"></span>
+      <button class="link-btn" id="clear-filters" type="button" hidden>Clear all filters</button>
     </div>
-    <div class="portfolio-grid" id="portfolio-grid"></div>
+    <div class="grid-3" id="prop-grid" aria-busy="true"></div>
   </div>
 </section>
 
-<!-- ═══════════════════ PROPERTIES ═══════════════════ -->
-<section id="properties">
+<!-- ═══════════ OUR WORK ═══════════ -->
+<section class="portfolio" id="portfolio" aria-labelledby="work-title">
   <div class="container">
-    <div class="prop-header">
+    <div class="section-head">
       <div>
-        <div class="section-label">Marketplace</div>
-        <h2 class="section-h2">Property <em>Marketplace</em></h2>
-        <p class="section-desc">Find your perfect home from our curated selection of premium properties across Pakistan.</p>
-      </div>
-      <div class="prop-filters">
-        <button class="filter-btn active" onclick="filterProps('all')">All Properties</button>
-        <button class="filter-btn" onclick="filterProps('FOR SALE')">For Sale</button>
-        <button class="filter-btn" onclick="filterProps('FOR RENT')">For Rent</button>
+        <div class="eyebrow">Our Work</div>
+        <h2 class="h2" id="work-title">A legacy of <em>excellence</em></h2>
+        <p class="lead">Three decades of residential and commercial construction across Pakistan's most sought-after locations.</p>
       </div>
     </div>
-    <div class="prop-grid" id="prop-grid"></div>
-    <div class="no-props" id="no-props">
-      <div class="no-props-icon">🏠</div>
-      <p>No properties found for this filter.</p>
+    <div class="stats reveal">
+      <div class="stat"><div class="ic-wrap"><svg class="ic ic-lg" aria-hidden="true"><use href="/assets/icons.svg#building"/></svg></div><b><span class="count" data-to="150">150</span><span>+</span></b><p>Projects completed</p></div>
+      <div class="stat"><div class="ic-wrap"><svg class="ic ic-lg" aria-hidden="true"><use href="/assets/icons.svg#home"/></svg></div><b><span class="count" data-to="500">500</span><span>+</span></b><p>Homes sold</p></div>
+      <div class="stat"><div class="ic-wrap"><svg class="ic ic-lg" aria-hidden="true"><use href="/assets/icons.svg#key"/></svg></div><b><span class="count" data-to="200">200</span><span>+</span></b><p>Properties rented</p></div>
+      <div class="stat"><div class="ic-wrap"><svg class="ic ic-lg" aria-hidden="true"><use href="/assets/icons.svg#award"/></svg></div><b><span class="count" data-to="30">30</span><span>+</span></b><p>Years of experience</p></div>
     </div>
+    <div class="grid-3" id="portfolio-grid"></div>
   </div>
 </section>
 
-<!-- ═══════════════════ WHY US ═══════════════════ -->
-<section id="why-us" style="padding:0">
-  <div id="why-us-inner" style="background:var(--teal-dark);padding:90px 60px 0">
-    <div style="text-align:center;margin-bottom:56px">
-      <div class="section-label" style="justify-content:center;color:var(--gold)">Our Promise</div>
-      <h2 class="section-h2" style="color:white">Why Choose <em style="color:var(--gold)">MidLand</em></h2>
+<!-- ═══════════ WHY US ═══════════ -->
+<section class="why on-dark" id="why-us" aria-labelledby="why-title" style="padding-bottom:0">
+  <div class="container">
+    <div class="center" style="margin-bottom:52px">
+      <div class="eyebrow">Our Promise</div>
+      <h2 class="h2" id="why-title">Why choose <em>MidLand</em></h2>
     </div>
     <div class="why-grid">
-      <div class="why-card fade-up">
-        <div class="why-icon-wrap"><div class="why-icon">🏆</div><div class="why-icon-ring"></div></div>
-        <div class="why-title">30 Years of Trust</div>
-        <div class="why-desc">Three decades of building excellence with thousands of satisfied families across Pakistan.</div>
-        <div class="why-stat">1995 <span>se aaj tak</span></div>
-      </div>
-      <div class="why-card fade-up">
-        <div class="why-icon-wrap"><div class="why-icon">💎</div><div class="why-icon-ring"></div></div>
-        <div class="why-title">Premium Quality</div>
-        <div class="why-desc">Every property is built with the finest materials and crafted to international standards.</div>
-        <div class="why-stat">ISO <span>Certified</span></div>
-      </div>
-      <div class="why-card fade-up">
-        <div class="why-icon-wrap"><div class="why-icon">🤝</div><div class="why-icon-ring"></div></div>
-        <div class="why-title">End-to-End Service</div>
-        <div class="why-desc">From site selection to legal documentation, we handle every step with full transparency.</div>
-        <div class="why-stat">100% <span>Transparent</span></div>
-      </div>
-      <div class="why-card fade-up">
-        <div class="why-icon-wrap"><div class="why-icon">📍</div><div class="why-icon-ring"></div></div>
-        <div class="why-title">Prime Locations</div>
-        <div class="why-desc">Access exclusive properties in DHA, Bahria Town, Gulberg, and all premium localities.</div>
-        <div class="why-stat">6+ <span>Cities</span></div>
-      </div>
+      <div class="why-card reveal"><div class="why-icon"><svg class="ic ic-lg" aria-hidden="true"><use href="/assets/icons.svg#award"/></svg></div>
+        <h3>30 years of experience</h3><p>Building and selling homes in Pakistan since 1995 — we know every stage, from approvals to handover.</p></div>
+      <div class="why-card reveal"><div class="why-icon"><svg class="ic ic-lg" aria-hidden="true"><use href="/assets/icons.svg#gem"/></svg></div>
+        <h3>Quality construction</h3><p>Quality materials, experienced site teams and inspections at every stage of the build.</p></div>
+      <div class="why-card reveal"><div class="why-icon"><svg class="ic ic-lg" aria-hidden="true"><use href="/assets/icons.svg#layers"/></svg></div>
+        <h3>End-to-end service</h3><p>Site selection, design, construction, legal documentation and transfer — one team, one point of contact.</p></div>
+      <div class="why-card reveal"><div class="why-icon"><svg class="ic ic-lg" aria-hidden="true"><use href="/assets/icons.svg#pin"/></svg></div>
+        <h3>Prime locations</h3><p>Listings in DHA, Bahria Town, Gulberg, Model Town and other premium areas of Lahore, Islamabad and Karachi.</p></div>
     </div>
   </div>
-  <!-- Marquee CTA Banner -->
-  <div class="marquee-cta">
+  <div class="marquee" style="margin-top:72px" aria-hidden="true">
     <div class="marquee-track">
-      <span>🏡 DHA Phase 6 Lahore &nbsp;•&nbsp;</span>
-      <span>🏢 Bahria Town Islamabad &nbsp;•&nbsp;</span>
-      <span>🌆 Gulberg III Lahore &nbsp;•&nbsp;</span>
-      <span>🏗️ 150+ Projects Delivered &nbsp;•&nbsp;</span>
-      <span>🔑 200+ Properties Rented &nbsp;•&nbsp;</span>
-      <span>⭐ Pakistan's Most Trusted Builder &nbsp;•&nbsp;</span>
-      <span>🏡 DHA Phase 6 Lahore &nbsp;•&nbsp;</span>
-      <span>🏢 Bahria Town Islamabad &nbsp;•&nbsp;</span>
-      <span>🌆 Gulberg III Lahore &nbsp;•&nbsp;</span>
-      <span>🏗️ 150+ Projects Delivered &nbsp;•&nbsp;</span>
-      <span>🔑 200+ Properties Rented &nbsp;•&nbsp;</span>
-      <span>⭐ Pakistan's Most Trusted Builder &nbsp;•&nbsp;</span>
+      <span>DHA Lahore</span><span>Bahria Town Islamabad</span><span>Gulberg III</span><span>Model Town</span><span>150+ projects delivered</span><span>Building since 1995</span>
+      <span>DHA Lahore</span><span>Bahria Town Islamabad</span><span>Gulberg III</span><span>Model Town</span><span>150+ projects delivered</span><span>Building since 1995</span>
     </div>
   </div>
 </section>
 
-<!-- ═══════════════════ APPOINTMENT ═══════════════════ -->
-<section id="appointment">
+<!-- ═══════════ TESTIMONIALS (shown only when real reviews are added in assets/home.js) ═══════════ -->
+<section id="testimonials" aria-labelledby="t-title" hidden>
   <div class="container">
-    <div style="text-align:center;margin-bottom:64px;position:relative;z-index:1">
-      <div class="section-label" style="justify-content:center">Schedule a Visit</div>
-      <h2 class="section-h2" style="color:white">Book an <em style="color:var(--gold)">Appointment</em></h2>
-      <p class="section-desc" style="color:rgba(255,255,255,.55);margin:16px auto 0">Our expert team is ready to help you find the perfect property or discuss your construction needs.</p>
+    <div class="center" style="margin-bottom:44px">
+      <div class="eyebrow">Client Stories</div>
+      <h2 class="h2" id="t-title">What our <em>clients</em> say</h2>
     </div>
-    <div class="appt-grid">
-      <div class="appt-left">
-        <div class="section-label" style="color:var(--gold)">Why Book With Us</div>
-        <h2 class="section-h2" style="color:white;font-size:clamp(28px,3vw,42px)">A Consultation<br>That <em style="color:var(--gold)">Changes</em><br>Everything</h2>
-        <div class="appt-why">
-          <div class="appt-why-item"><div class="appt-why-icon">🎯</div><div class="appt-why-text"><h4>Expert Consultation</h4><p>Personalized advice from professionals with deep local market knowledge.</p></div></div>
-          <div class="appt-why-item"><div class="appt-why-icon">💎</div><div class="appt-why-text"><h4>Exclusive Access</h4><p>Off-market listings and opportunities not available to the general public.</p></div></div>
-          <div class="appt-why-item"><div class="appt-why-icon">📋</div><div class="appt-why-text"><h4>Full Legal Support</h4><p>From property search to documentation — we handle every step seamlessly.</p></div></div>
-          <div class="appt-why-item"><div class="appt-why-icon">⏱</div><div class="appt-why-text"><h4>Fast Turnaround</h4><p>We confirm your appointment within 2 hours during business hours.</p></div></div>
-        </div>
-      </div>
-      <div>
-        <div class="appt-form-card">
-          <h3>Schedule Your Visit</h3>
-          <p>Fill in your details and our team will confirm within 2 hours.</p>
-          <input type="hidden" id="f-prop-id">
-          <input type="hidden" id="f-prop-name">
-          <div class="form-group"><label>Full Name *</label><input type="text" id="f-name" placeholder="Your full name"></div>
-          <div class="form-row">
-            <div class="form-group"><label>Email *</label><input type="email" id="f-email" placeholder="you@email.com"></div>
-            <div class="form-group"><label>Phone *</label><input type="tel" id="f-phone" placeholder="+92 300 1234567"></div>
-          </div>
-          <div class="form-row">
-            <div class="form-group"><label>Preferred Date *</label><input type="date" id="f-date"></div>
-            <div class="form-group"><label>Preferred Time</label>
-              <select id="f-time">
-                <option>10:00 AM</option><option>11:00 AM</option><option>12:00 PM</option>
-                <option>02:00 PM</option><option>03:00 PM</option><option>04:00 PM</option><option>05:00 PM</option>
-              </select>
-            </div>
-          </div>
-          <div class="form-group"><label>Purpose</label>
-            <select id="f-purpose">
-              <option>Buy a Property</option><option>Rent a Property</option>
-              <option>Sell My Property</option><option>Construction Consultation</option><option>Investment Inquiry</option>
-            </select>
-          </div>
-          <div class="form-group"><label>Message (Optional)</label>
-            <textarea id="f-msg" placeholder="Any specific requirements, preferences, or questions..."></textarea>
-          </div>
-          <button class="btn-submit" id="appt-btn" onclick="bookAppointment()">Confirm Appointment →</button>
-        </div>
-      </div>
-    </div>
+    <div class="quotes" id="quotes"></div>
   </div>
 </section>
 
-<!-- ═══════════════════ FOOTER ═══════════════════ -->
-<footer>
-  <div class="footer-grid">
-    <div class="footer-brand">
-      <div class="name">MidLand Constructions</div>
-      <div class="tagline">Building Dreams Since 1995</div>
-      <p>Premier real estate and construction company headquartered in Lahore, serving clients across Pakistan with integrity, excellence, and unmatched expertise.</p>
-      <div class="footer-socials">
-        <a class="social-btn" href="https://facebook.com/midlandconstructions" target="_blank" rel="noopener" title="Facebook">
-          <svg viewBox="0 0 24 24" fill="currentColor" width="17" height="17"><path d="M24 12.073C24 5.404 18.627 0 12 0S0 5.404 0 12.073C0 18.1 4.388 23.094 10.125 24v-8.437H7.078v-3.49h3.047V9.41c0-3.025 1.792-4.697 4.533-4.697 1.312 0 2.686.236 2.686.236v2.97h-1.513c-1.491 0-1.956.93-1.956 1.886v2.267h3.328l-.532 3.49h-2.796V24C19.612 23.094 24 18.1 24 12.073z"/></svg>
-        </a>
-        <a class="social-btn" href="https://instagram.com/midlandconstructions" target="_blank" rel="noopener" title="Instagram">
-          <svg viewBox="0 0 24 24" fill="currentColor" width="17" height="17"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
-        </a>
-        <a class="social-btn" href="https://tiktok.com/@midlandconstructions" target="_blank" rel="noopener" title="TikTok">
-          <svg viewBox="0 0 24 24" fill="currentColor" width="17" height="17"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.76a4.85 4.85 0 01-1.01-.07z"/></svg>
-        </a>
-        <a class="social-btn" href="https://wa.me/923001234567" target="_blank" rel="noopener" title="WhatsApp">
-          <svg viewBox="0 0 24 24" fill="currentColor" width="17" height="17"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-        </a>
+<!-- ═══════════ BOOKING ═══════════ -->
+<section class="booking on-dark" id="appointment" aria-labelledby="book-title">
+  <div class="container booking-grid">
+    <div>
+      <div class="eyebrow">Schedule a Visit</div>
+      <h2 class="h2" id="book-title">A consultation that <em>changes</em> everything</h2>
+      <p class="lead">Talk to our team about buying, renting, selling or building — in person at our office or on site.</p>
+      <div class="perks">
+        <div class="perk"><div class="why-icon"><svg class="ic" aria-hidden="true"><use href="/assets/icons.svg#target"/></svg></div><div><h3>Expert consultation</h3><p>Personal advice from people who know the local market.</p></div></div>
+        <div class="perk"><div class="why-icon"><svg class="ic" aria-hidden="true"><use href="/assets/icons.svg#key"/></svg></div><div><h3>Exclusive access</h3><p>Ask about listings and opportunities not yet published online.</p></div></div>
+        <div class="perk"><div class="why-icon"><svg class="ic" aria-hidden="true"><use href="/assets/icons.svg#file-check"/></svg></div><div><h3>Legal support</h3><p>We guide you through documentation and transfer, step by step.</p></div></div>
+        <div class="perk"><div class="why-icon"><svg class="ic" aria-hidden="true"><use href="/assets/icons.svg#zap"/></svg></div><div><h3>Fast confirmation</h3><p>We confirm within 2 business hours, Monday to Saturday.</p></div></div>
       </div>
     </div>
-    <div class="footer-col">
+    <div class="form-card" data-booking></div>
+  </div>
+</section>
+</main>
+
+<footer class="footer">
+  <div class="footer-grid">
+    <div>
+      <a class="brand" href="/"><img class="brand-logo" src="/assets/logo.jpg" alt="" width="44" height="44"><span><span class="brand-name">MidLand Constructions</span><br><span class="brand-tag">Building Dreams Since 1995</span></span></a>
+      <p>Real estate and construction company headquartered in Lahore, serving clients across Pakistan.</p>
+      <div class="socials">
+        <a href="https://facebook.com/midlandconstructions" target="_blank" rel="noopener" aria-label="Facebook"><svg class="ic" aria-hidden="true"><use href="/assets/icons.svg#facebook"/></svg></a>
+        <a href="https://instagram.com/midlandconstructions" target="_blank" rel="noopener" aria-label="Instagram"><svg class="ic" aria-hidden="true"><use href="/assets/icons.svg#instagram"/></svg></a>
+        <a href="https://tiktok.com/@midlandconstructions" target="_blank" rel="noopener" aria-label="TikTok"><svg class="ic" aria-hidden="true"><use href="/assets/icons.svg#tiktok"/></svg></a>
+        <a data-wa="" href="#" target="_blank" rel="noopener" aria-label="WhatsApp"><svg class="ic" aria-hidden="true"><use href="/assets/icons.svg#whatsapp"/></svg></a>
+      </div>
+    </div>
+    <div>
       <h4>Company</h4>
-      <a onclick="navTo('home')">Home</a>
-      <a onclick="navTo('portfolio')">Portfolio</a>
-      <a onclick="navTo('properties')">Properties</a>
-      <a onclick="navTo('appointment')">Book Appointment</a>
+      <ul><li><a href="#properties">Properties</a></li><li><a href="#portfolio">Our work</a></li><li><a href="#why-us">Why us</a></li><li><a href="#appointment">Book a visit</a></li></ul>
     </div>
-    <div class="footer-col">
+    <div>
       <h4>Properties</h4>
-      <a onclick="filterProps('FOR SALE');navTo('properties')">For Sale</a>
-      <a onclick="filterProps('FOR RENT');navTo('properties')">For Rent</a>
-      <a>Residential</a>
-      <a>Commercial</a>
-      <a>Apartments & Plots</a>
+      <ul>
+        <li><a href="/?type=FOR+SALE#properties" data-filter='{"type":"FOR SALE"}'>For sale</a></li>
+        <li><a href="/?type=FOR+RENT#properties" data-filter='{"type":"FOR RENT"}'>For rent</a></li>
+        <li><a href="/?cat=Residential#properties" data-filter='{"cat":"Residential"}'>Residential</a></li>
+        <li><a href="/?cat=Commercial#properties" data-filter='{"cat":"Commercial"}'>Commercial</a></li>
+        <li><a href="/?cat=Apartment#properties" data-filter='{"cat":"Apartment"}'>Apartments</a></li>
+        <li><a href="/?cat=Plot#properties" data-filter='{"cat":"Plot"}'>Plots</a></li>
+      </ul>
     </div>
-    <div class="footer-col">
+    <div>
       <h4>Contact</h4>
-      <a>📍 DHA Phase 6, Lahore</a>
-      <a>📞 +92 300 1234567</a>
-      <a>✉️ info@midlandpk.com</a>
-      <a>🕐 Mon–Sat: 9am – 7pm</a>
-      <a>🌐 www.midlandpk.com</a>
+      <ul class="contact">
+        <li><svg class="ic" aria-hidden="true"><use href="/assets/icons.svg#pin"/></svg><span data-cfg="address">DHA Phase 6, Lahore</span></li>
+        <li><svg class="ic" aria-hidden="true"><use href="/assets/icons.svg#phone"/></svg><a data-cfg="phone" href="#">+92 300 1234567</a></li>
+        <li><svg class="ic" aria-hidden="true"><use href="/assets/icons.svg#mail"/></svg><a data-cfg="email" href="#">info@midlandpk.com</a></li>
+        <li><svg class="ic" aria-hidden="true"><use href="/assets/icons.svg#clock"/></svg><span data-cfg="hours">Mon–Sat, 9:00 AM – 7:00 PM</span></li>
+      </ul>
     </div>
   </div>
   <div class="footer-bottom">
-    <span>© 2025 MidLand Constructions. All rights reserved.</span>
-    <span>Crafted with ♥ in Lahore, Pakistan</span>
+    <span>© <span data-year>2026</span> MidLand Constructions. All rights reserved.</span>
+    <span><a href="/privacy">Privacy policy</a><a href="/terms">Terms of use</a></span>
   </div>
 </footer>
 
-<script>
-// ─── CONFIG ───────────────────────────────────────────────────────────────────
-const API = '/api';
-let useAPI = false;
+<a class="wa-float" data-wa="Assalam o Alaikum! I visited your website and I'm interested in a property." href="#" target="_blank" rel="noopener" aria-label="Chat with us on WhatsApp"><svg class="ic" aria-hidden="true"><use href="/assets/icons.svg#whatsapp"/></svg></a>
+<button class="back-top" aria-label="Back to top"><svg class="ic" aria-hidden="true"><use href="/assets/icons.svg#arrow-up"/></svg></button>
 
-// ─── LOCAL DATA ───────────────────────────────────────────────────────────────
-let properties = [
-  { id:'S0001', title:"Luxury Villa – DHA Phase 8", location:"DHA Phase 8, Karachi", type:"FOR SALE", category:"Residential", price:"PKR 12 Crore", area:"6000", beds:6, baths:5, floor:"G+1", status:"available", img:"https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=600", desc:"An exceptional 6,000 sq ft villa set in the heart of DHA Phase 8. Featuring a private swimming pool, home theatre, and an imported Italian kitchen, this residence sits within one of Pakistan's finest gated communities. Complete with 24/7 security, dedicated parking, and a beautifully landscaped garden — a true dream home." },
-  { id:'S0002', title:"Bahria Town Residence", location:"Bahria Town, Islamabad", type:"FOR SALE", category:"Residential", price:"PKR 8.5 Crore", area:"5000", beds:5, baths:4, floor:"G+1", status:"available", img:"https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=600", desc:"Set amid Islamabad's scenic hills, this double-storey residence in Bahria Town offers a world of its own. Built with a landscaped garden, underground parking, CCTV surveillance, and premium fixtures throughout, it's designed for families who value both quality and security. Parks, top schools, and shopping malls are all just minutes away." },
-  { id:'R0001', title:"Luxury Apartment – Gulberg", location:"Gulberg III, Lahore", type:"FOR RENT", category:"Apartment", price:"PKR 2.5 Lac/mo", area:"2200", beds:3, baths:3, floor:"8th Floor", status:"available", img:"https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600", desc:"This fully furnished luxury apartment is available for rent in Gulberg III — Lahore's most sought-after address. Enjoy breathtaking city views from the 8th floor, a rooftop lounge, a fully equipped gym, and round-the-clock concierge service. For anyone who truly wants to live in the heart of the city, this apartment is the perfect fit." },
-  { id:'R0002', title:"Family Home – Model Town", location:"Model Town, Lahore", type:"FOR RENT", category:"Residential", price:"PKR 1.8 Lac/mo", area:"3800", beds:4, baths:3, floor:"G+1", status:"available", img:"https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=600", desc:"A spacious 4-bedroom family home in Model Town Extension, ideal for those seeking a peaceful, secure, and welcoming neighbourhood. Mature trees line the street outside, premium finishes furnish the interior, and parks, schools, and markets are all within easy walking distance." },
-  { id:'R0003', title:"Studio Apartment – MM Alam", location:"MM Alam Road, Lahore", type:"FOR RENT", category:"Apartment", price:"PKR 60K/mo", area:"900", beds:1, baths:1, floor:"4th Floor", status:"available", img:"https://images.unsplash.com/photo-1554995207-c18c203602cb?w=600", desc:"A modern studio apartment on MM Alam Road — one of Lahore's most vibrant streets — built for young professionals who want to live life on their own terms. Fully furnished with appliances included, and filled with natural light on the 4th floor. Cafes, restaurants, and offices are all close by." },
-  { id:'C0001', title:"Commercial Plaza – Main Blvd", location:"Main Boulevard, Lahore", type:"FOR SALE", category:"Commercial", price:"PKR 25 Crore", area:"12000", beds:0, baths:8, floor:"G+3", status:"available", img:"https://images.unsplash.com/photo-1486325212027-8081e485255e?w=600", desc:"A G+3 commercial plaza on Main Boulevard, positioned in one of Pakistan's most prominent business districts. Ground-floor retail space, premium offices on the upper floors, central A/C, full backup power, 3 lifts, and ample parking. A rare opportunity for investors and business owners alike." }
-];
-let appointments = [];
-let nextId = 7;
-let activeFilter = 'all';
-let currentModalProp = null;
-
-const portfolio = [
-  { title:"Luxury Villas – DHA Phase 8", location:"Karachi", year:"Completed 2024", category:"Residential", img:"https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=600" },
-  { title:"Grand Mall Complex", location:"Lahore", year:"Completed 2023", category:"Commercial", img:"https://images.unsplash.com/photo-1486325212027-8081e485255e?w=600" },
-  { title:"Bahria Town Residences", location:"Islamabad", year:"Completed 2024", category:"Residential", img:"https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=600" },
-  { title:"Model Town Extension", location:"Lahore", year:"Completed 2022", category:"Residential", img:"https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=600" },
-  { title:"Clifton Heights", location:"Karachi", year:"Completed 2023", category:"Apartment", img:"https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600" },
-  { title:"F-7 Corporate Tower", location:"Islamabad", year:"Completed 2021", category:"Commercial", img:"https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=600" }
-];
-
-// ─── LOCALSTORAGE BRIDGE (Netlify / no-backend fallback) ─────────────────────
-// When no backend API is running, appointments are saved to localStorage so
-// admin.html can read them from the same browser. This makes Netlify work.
-const LS_APPTS = 'mc_appointments';
-const LS_PROPS = 'mc_properties';
-
-function lsSaveAppts() {
-  try { localStorage.setItem(LS_APPTS, JSON.stringify(appointments)); } catch {}
-}
-function lsLoadAppts() {
-  try { const d = localStorage.getItem(LS_APPTS); if (d) appointments = JSON.parse(d); } catch {}
-}
-function lsLoadProps() {
-  try {
-    const d = localStorage.getItem(LS_PROPS);
-    if (d) {
-      const saved = JSON.parse(d);
-      if (saved.length) properties = saved;
-    }
-  } catch {}
-}
-
-// ─── API ──────────────────────────────────────────────────────────────────────
-async function checkAPI() {
-  try {
-    const r = await fetch(API+'/properties',{signal:AbortSignal.timeout(2500)});
-    if(r.ok){ useAPI=true; properties=await r.json(); renderProperties(); }
-  } catch {
-    // No backend — load any properties admin may have added via localStorage
-    lsLoadProps();
-    renderProperties();
-  }
-}
-
-async function apiPost(path,data){
-  return fetch(API+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}).then(r=>r.json());
-}
-
-// ─── VILLA GALLERY ────────────────────────────────────────────────────────────
-let villaIdx = 0;
-const VILLA_COUNT = 4;
-let villaTimer;
-
-function goSlide(n) {
-  const slides = document.querySelectorAll('.villa-slide');
-  const dots = document.querySelectorAll('.vdot');
-  slides[villaIdx].classList.remove('active');
-  dots[villaIdx].classList.remove('active');
-  villaIdx = (n + VILLA_COUNT) % VILLA_COUNT;
-  slides[villaIdx].classList.add('active');
-  dots[villaIdx].classList.add('active');
-  clearInterval(villaTimer);
-  villaTimer = setInterval(() => goSlide(villaIdx + 1), 4500);
-}
-
-function slideVilla(dir) { goSlide(villaIdx + dir); }
-
-// ─── COUNTER ANIMATION ────────────────────────────────────────────────────────
-function animateCounters(){
-  document.querySelectorAll('.num[data-count]').forEach(el=>{
-    const target=parseInt(el.dataset.count);
-    let cur=0;
-    const step=Math.ceil(target/60);
-    const t=setInterval(()=>{
-      cur=Math.min(cur+step,target);
-      el.textContent=cur+'+';
-      if(cur>=target)clearInterval(t);
-    },25);
-  });
-}
-
-// ─── RENDER PORTFOLIO ─────────────────────────────────────────────────────────
-function renderPortfolio(){
-  document.getElementById('portfolio-grid').innerHTML=portfolio.map(p=>`
-    <div class="portfolio-card fade-up">
-      <div class="pc-img"><img src="${p.img}" alt="${p.title}" loading="lazy" onclick="event.stopPropagation();openLightbox('${p.img}','${p.title.replace(/'/g,"\\'")}')" title="Click to view full size"><div class="pc-badge">${p.category}</div></div>
-      <div class="pc-body"><h3>${p.title}</h3><div class="loc">📍 ${p.location}</div><div class="year">${p.year}</div></div>
-    </div>`).join('');
-}
-
-// ─── RENDER PROPERTIES ────────────────────────────────────────────────────────
-function renderProperties(){
-  const avail=properties.filter(p=>p.status==='available');
-  const list=activeFilter==='all'?avail:avail.filter(p=>p.type===activeFilter);
-  const g=document.getElementById('prop-grid');
-  const nop=document.getElementById('no-props');
-  if(!list.length){g.innerHTML='';nop.style.display='block';return;}
-  nop.style.display='none';
-  g.innerHTML=list.map(p=>`
-    <div class="prop-card fade-up" onclick="openModal('${p.id}')">
-      <div class="prop-img">
-        <img src="${p.img}" alt="${p.title}" loading="lazy" onclick="event.stopPropagation();openLightbox('${p.img}','${p.title.replace(/'/g,"\\'")}')" title="Click to view full size">
-        <div class="prop-tag">${p.type}</div>
-        <button class="prop-fav" onclick="event.stopPropagation();toggleFav(this)" title="Save">♡</button>
-      </div>
-      <div class="prop-body">
-        <h3>${p.title}</h3>
-        <div class="prop-loc">📍 ${p.location}</div>
-        <div class="prop-features">
-          <div class="prop-feat"><span>🛏</span>${p.beds||0} Beds</div>
-          <div class="prop-feat"><span>🚿</span>${p.baths} Baths</div>
-          <div class="prop-feat"><span>📐</span>${p.area} sqft</div>
-        </div>
-        <div class="prop-footer">
-          <div class="prop-price">${p.price}<small>${p.category}</small></div>
-          <button class="prop-cta" onclick="event.stopPropagation();openModal('${p.id}')">Details</button>
-        </div>
-      </div>
-    </div>`).join('');
-  observeFade();
-}
-
-function filterProps(f){
-  activeFilter=f;
-  document.querySelectorAll('.filter-btn').forEach(b=>{
-    const txt=b.textContent.trim();
-    b.classList.toggle('active',
-      (f==='all'&&txt==='All Properties')||(f==='FOR SALE'&&txt==='For Sale')||(f==='FOR RENT'&&txt==='For Rent'));
-  });
-  renderProperties();
-}
-
-function toggleFav(btn){
-  btn.classList.toggle('liked');
-  btn.textContent=btn.classList.contains('liked')?'♥':'♡';
-  showToast(btn.classList.contains('liked')?'❤️ Saved to favourites':'🗑 Removed from favourites');
-}
-
-// ─── MODAL ────────────────────────────────────────────────────────────────────
-function openModal(id){
-  const p=properties.find(x=>x.id==id);
-  if(!p)return;
-  currentModalProp=p;
-  document.getElementById('modal-img').src=p.img;
-  document.getElementById('modal-tag').textContent=p.type;
-  document.getElementById('modal-title').textContent=p.title;
-  document.getElementById('modal-loc').textContent='📍 '+p.location;
-  document.getElementById('modal-price').textContent=p.price;
-  document.getElementById('modal-beds').textContent=p.beds||'—';
-  document.getElementById('modal-baths').textContent=p.baths;
-  document.getElementById('modal-area').textContent=p.area;
-  document.getElementById('modal-floor').textContent=p.floor||'—';
-  document.getElementById('modal-desc').textContent=p.desc;
-  document.getElementById('prop-modal').classList.add('open');
-  document.body.style.overflow='hidden';
-}
-function closeModal(){document.getElementById('prop-modal').classList.remove('open');document.body.style.overflow='';}
-
-// ─── IMAGE LIGHTBOX ───────────────────────────────────────────────────────────
-function openLightbox(src, caption){
-  document.getElementById('lightbox-img').src = src;
-  document.getElementById('lightbox-caption').textContent = caption || '';
-  document.getElementById('lightbox-overlay').classList.add('open');
-  document.body.style.overflow = 'hidden';
-}
-function closeLightbox(){
-  document.getElementById('lightbox-overlay').classList.remove('open');
-  document.body.style.overflow = document.getElementById('prop-modal').classList.contains('open') ? 'hidden' : '';
-}
-document.addEventListener('keydown', e => { if(e.key === 'Escape') closeLightbox(); });
-document.getElementById('prop-modal').addEventListener('click',function(e){if(e.target===this)closeModal();});
-function scrollToAppt(){
-  if(currentModalProp){
-    const p=currentModalProp;
-    // Pre-fill the purpose field and add property note
-    const purposeEl=document.getElementById('f-purpose');
-    if(purposeEl){
-      const val=p.type==='FOR RENT'?'Rent a Property':'Buy a Property';
-      purposeEl.value=val;
-    }
-    // Show property banner in form
-    let banner=document.getElementById('appt-prop-banner');
-    if(!banner){
-      banner=document.createElement('div');
-      banner.id='appt-prop-banner';
-      banner.style.cssText='background:linear-gradient(135deg,var(--teal-dark),#1a3a4a);border:1px solid rgba(201,168,76,.3);border-radius:12px;padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;gap:14px;animation:fadeIn .4s';
-      document.querySelector('.appt-form-card h3').after(banner);
-    }
-    banner.innerHTML=`<div style="font-size:28px">🏠</div><div><div style="font-size:11px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.06em;font-weight:600">Booking Appointment For</div><div style="color:white;font-weight:600;font-size:15px;margin-top:2px">${p.title}</div><div style="color:var(--gold);font-size:12px;margin-top:2px">Property ID: <strong>${p.id}</strong> &nbsp;•&nbsp; ${p.location} &nbsp;•&nbsp; ${p.price}</div></div>`;
-    banner.style.display='flex';
-    // Set hidden property ID
-    document.getElementById('f-prop-id').value=p.id;
-    document.getElementById('f-prop-name').value=p.title;
-  } else {
-    // Hide banner if navigating without a property
-    const banner=document.getElementById('appt-prop-banner');
-    if(banner) banner.style.display='none';
-    document.getElementById('f-prop-id').value='';
-    document.getElementById('f-prop-name').value='';
-  }
-  closeModal();
-  navTo('appointment');
-}
-function shareProperty(){
-  if(!currentModalProp){showToast('⚠️ Please select a property first.');return;}
-  const p = currentModalProp;
-  const text = `🏠 *${p.title}*\n📍 ${p.location}\n💰 ${p.price}\n\nView more on MidLand Constructions: ${window.location.href}`;
-  const waLink = `https://wa.me/?text=${encodeURIComponent(text)}`;
-  window.open(waLink, '_blank', 'noopener');
-}
-
-// ─── APPOINTMENT ──────────────────────────────────────────────────────────────
-async function bookAppointment(){
-  const name=document.getElementById('f-name').value.trim();
-  const email=document.getElementById('f-email').value.trim();
-  const phone=document.getElementById('f-phone').value.trim();
-  const date=document.getElementById('f-date').value;
-  const time=document.getElementById('f-time').value;
-  const purpose=document.getElementById('f-purpose').value;
-  const msg=document.getElementById('f-msg').value.trim();
-  if(!name||!email||!phone||!date){showToast('⚠️ Please fill all required fields.');return;}
-  const btn=document.getElementById('appt-btn');
-  btn.disabled=true; btn.textContent='Sending…';
-  // Always capture from currentModalProp as safety net in case hidden fields weren't set
-  const propId = document.getElementById('f-prop-id').value || (currentModalProp ? currentModalProp.id : '');
-  const propName = document.getElementById('f-prop-name').value || (currentModalProp ? currentModalProp.title : '');
-  const appt={id:String(Date.now()),name,email,phone,date,time,purpose,msg,confirmed:false,propertyId:propId,propertyName:propName};
-  if(useAPI){
-    try{await apiPost('/appointments',appt);}catch{}
-  } else {
-    // No backend — persist to localStorage so admin.html can read it
-    appointments.push(appt);
-    lsSaveAppts();
-  }
-  ['f-name','f-email','f-phone','f-date','f-msg'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('f-prop-id').value='';
-  document.getElementById('f-prop-name').value='';
-  currentModalProp=null;
-  const banner=document.getElementById('appt-prop-banner');
-  if(banner) banner.style.display='none';
-  btn.disabled=false; btn.textContent='Confirm Appointment →';
-  showToast('✅ Appointment booked! We\'ll confirm shortly.');
-}
-
-// ─── NAV ──────────────────────────────────────────────────────────────────────
-function navTo(id){
-  document.getElementById(id)?.scrollIntoView({behavior:'smooth'});
-  document.getElementById('nav-links').classList.remove('open');
-  document.getElementById('menu-btn').textContent='☰';
-}
-function toggleMobileMenu(){
-  const nl=document.getElementById('nav-links');
-  const open=nl.classList.toggle('open');
-  document.getElementById('menu-btn').textContent=open?'✕':'☰';
-}
-function showSection(id){navTo(id);}
-
-// ─── TOAST ────────────────────────────────────────────────────────────────────
-let toastTimer;
-function showToast(msg,icon=''){
-  clearTimeout(toastTimer);
-  document.getElementById('toast-msg').textContent=msg;
-  document.getElementById('toast-icon').textContent=icon||'✓';
-  document.getElementById('toast').classList.add('show');
-  toastTimer=setTimeout(()=>document.getElementById('toast').classList.remove('show'),3800);
-}
-
-// ─── SCROLL FX ────────────────────────────────────────────────────────────────
-function observeFade(){
-  const obs=new IntersectionObserver(entries=>{
-    entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target);}});
-  },{threshold:.08});
-  document.querySelectorAll('.fade-up:not(.visible)').forEach(el=>obs.observe(el));
-}
-
-// ─── BACK TO TOP ─────────────────────────────────────────────────────────────
-window.addEventListener('scroll',()=>{
-  document.getElementById('navbar').style.boxShadow=scrollY>60?'0 4px 30px rgba(0,0,0,.3)':'none';
-  document.getElementById('back-top').classList.toggle('show',scrollY>600);
-});
-
-// ─── COUNTER ANIMATION ────────────────────────────────────────────────────────
-function animateCounters(){
-  const counters=document.querySelectorAll('.counter-val');
-  const observer=new IntersectionObserver((entries)=>{
-    entries.forEach(entry=>{
-      if(entry.isIntersecting){
-        const el=entry.target;
-        if(el.dataset.animated) return;
-        el.dataset.animated='1';
-        const target=parseInt(el.dataset.target);
-        const duration=1800;
-        const start=performance.now();
-        function easeOut(t){return 1-Math.pow(1-t,3);}
-        function tick(now){
-          const t=Math.min((now-start)/duration,1);
-          el.textContent=Math.round(easeOut(t)*target);
-          if(t<1) requestAnimationFrame(tick);
-          else el.textContent=target;
-        }
-        requestAnimationFrame(tick);
-        // Animate the bar
-        const bar=el.closest('.stat-box').querySelector('.stat-bar');
-        if(bar) setTimeout(()=>{bar.style.transform='scaleX(1)';bar.style.transition='transform .8s ease';},200);
-        observer.unobserve(el);
-      }
-    });
-  },{threshold:.3});
-  counters.forEach(c=>observer.observe(c));
-}
-
-// ─── INIT ─────────────────────────────────────────────────────────────────────
-window.addEventListener('load',()=>{
-  setTimeout(()=>document.getElementById('loader').classList.add('hidden'),2200);
-  lsLoadAppts(); // load any previously saved appointments
-  renderPortfolio(); renderProperties();
-  observeFade(); checkAPI();
-  document.getElementById('f-date').min=new Date().toISOString().split('T')[0];
-  setTimeout(animateCounters,800);
-  document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
-  // Start villa gallery auto-play
-  villaTimer = setInterval(()=>goSlide(villaIdx+1), 4500);
-});
-</script>
+<script src="/assets/app.js"></script>
+<script src="/assets/home.js"></script>
 </body>
 </html>

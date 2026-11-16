@@ -4,14 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Admin Dashboard – MidLand Constructions</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/assets/logo.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
 <style>
 :root{
   --teal:#1a3a4a;--teal-dark:#0f2530;--teal-mid:#1e4a5e;
   --gold:#c9a84c;--gold-light:#e2c47a;--gold-pale:#f5edd8;
   --cream:#f8f4ee;--white:#fff;
-  --text-dark:#1a2630;--text-mid:#4a6070;--text-light:#8a9fac;
+  --text-dark:#1a2630;--text-mid:#4a6070;--text-light:#5c6f7b;
   --border:#e2ddd5;--sidebar:260px;
   --green:#2e7d32;--green-bg:#e8f5e9;
   --red:#c0392b;--red-bg:#fdecea;
@@ -155,8 +157,8 @@ table.dt{width:100%;border-collapse:collapse}
 .ac-detail{font-size:12px;color:var(--text-mid);margin-bottom:4px;display:flex;align-items:center;gap:6px}
 .ac-detail span{color:var(--text-light)}
 .ac-msg{font-size:12px;color:var(--text-mid);font-style:italic;margin-top:8px;padding:8px 12px;background:var(--cream);border-radius:6px}
-.ac-foot{display:flex;align-items:center;justify-content:space-between;margin-top:14px;padding-top:14px;border-top:1px solid var(--border)}
-.ac-date{font-size:13px;font-weight:600;color:var(--teal)}
+.ac-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:14px;padding-top:14px;border-top:1px solid var(--border)}
+.ac-date{white-space:nowrap;font-size:13px;font-weight:600;color:var(--teal)}
 .ac-time{font-size:12px;color:var(--text-light)}
 
 /* Empty state */
@@ -194,53 +196,62 @@ table.dt{width:100%;border-collapse:collapse}
   .kpi-grid{grid-template-columns:1fr}
   .content{padding:18px}
 }
+/* ── additions ── */
+.tabs{display:inline-flex;background:white;border:1px solid var(--border);border-radius:10px;padding:4px;gap:4px;flex-wrap:wrap}
+.tab{padding:7px 14px;border-radius:7px;font-size:13px;font-weight:600;border:0;background:transparent;color:var(--text-mid);cursor:pointer}
+.tab[aria-pressed="true"]{background:var(--teal);color:white}
+.price-preview{font-size:12px;color:var(--gold-ink,#7a5a10);margin-top:6px;font-weight:600}
+.img-previews{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.img-previews img{width:84px;height:62px;object-fit:cover;border-radius:6px;border:1px solid var(--border)}
+.hint{font-size:12px;color:var(--text-light);margin-top:6px}
+.badge.past{background:#eee;color:#555}
+.menu-toggle{display:none;background:none;border:0;font-size:22px;cursor:pointer;margin-right:12px}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+@media(max-width:900px){.menu-toggle{display:inline-block}.tb-stat,.tb-sep{display:none}}
 </style>
 </head>
 <body>
 
 <!-- LOGIN -->
 <div id="login-screen">
-  <div class="login-card">
+  <form class="login-card" id="login-form">
     <div class="lc-logo">
-      <div class="lc-icon">MC</div>
+      <img src="/assets/logo.jpg" alt="" style="width:72px;height:72px;border-radius:16px;margin:0 auto 16px;object-fit:contain;background:#fff">
       <h2>Admin Portal</h2>
       <p>MidLand Constructions Management System</p>
     </div>
-    <div class="lg"><label>Username</label><input type="text" id="l-user" placeholder="admin" value="admin" onkeydown="if(event.key==='Enter')doLogin()"></div>
-    <div class="lg"><label>Password</label><input type="password" id="l-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
-    <button class="login-btn" onclick="doLogin()">Sign In →</button>
-    <div class="login-err" id="login-err">Invalid username or password. Please try again.</div>
-  </div>
+    <div class="lg"><label for="l-user">Username</label><input type="text" id="l-user" autocomplete="username" required></div>
+    <div class="lg"><label for="l-pass">Password</label><input type="password" id="l-pass" autocomplete="current-password" required></div>
+    <button class="login-btn" type="submit" id="login-btn">Sign in →</button>
+    <div class="login-err" id="login-err" role="alert"></div>
+  </form>
 </div>
 
 <!-- SIDEBAR -->
 <div id="sidebar">
   <div class="sb-brand">
-    <div class="sb-icon">MC</div>
+    <img src="/assets/logo.jpg" alt="" style="width:46px;height:46px;border-radius:12px;background:#fff;object-fit:contain;margin-bottom:12px">
     <div class="sb-name">MidLand Constructions</div>
     <div class="sb-sub">Admin Dashboard</div>
   </div>
   <nav class="sb-nav">
     <div class="nav-sec">Overview</div>
-    <a class="nav-item active" onclick="goPage('dashboard')"><span class="ni">📊</span>Dashboard</a>
+    <a class="nav-item" data-page="dashboard" href="#dashboard"><span class="ni">📊</span>Dashboard</a>
     <div class="nav-sec">Properties</div>
-    <a class="nav-item" onclick="goPage('properties')"><span class="ni">🏠</span>All Properties</a>
-    <a class="nav-item" onclick="goPage('add')"><span class="ni">➕</span>Add Property</a>
+    <a class="nav-item" data-page="properties" href="#properties"><span class="ni">🏠</span>All Properties</a>
+    <a class="nav-item" data-page="edit" href="#edit"><span class="ni">➕</span>Add Property</a>
     <div class="nav-sec">Clients</div>
-    <a class="nav-item" onclick="goPage('appointments')">
-      <span class="ni">📋</span>Appointments
-      <span class="nav-badge" id="appt-badge">0</span>
-    </a>
-    <a class="nav-item" onclick="goPage('calendar')"><span class="ni">📅</span>Calendar</a>
-    <div class="nav-sec">Site</div>
-    <a class="nav-item" href="index.html" target="_blank"><span class="ni">🌐</span>View Website</a>
+    <a class="nav-item" data-page="appointments" href="#appointments"><span class="ni">📋</span>Appointments<span class="nav-badge" id="appt-badge">0</span></a>
+    <a class="nav-item" data-page="calendar" href="#calendar"><span class="ni">📅</span>Calendar</a>
+    <div class="nav-sec">Account</div>
+    <a class="nav-item" data-page="settings" href="#settings"><span class="ni">⚙️</span>Settings</a>
+    <a class="nav-item" href="/" target="_blank" rel="noopener"><span class="ni">🌐</span>View Website</a>
   </nav>
   <div class="sb-footer">
-    <div class="api-indicator"><div class="api-dot" id="api-dot"></div><span id="api-txt">Demo mode</span></div>
     <div class="sb-user">
-      <div class="su-av">A</div>
-      <div><div class="su-name">Administrator</div><div class="su-role">Full Access</div></div>
-      <button class="logout-btn" onclick="logout()" title="Logout">⏻</button>
+      <div class="su-av" id="su-av">A</div>
+      <div><div class="su-name" id="su-name">Administrator</div><div class="su-role">Full access</div></div>
+      <button class="logout-btn" id="logout-btn" title="Log out" aria-label="Log out">⏻</button>
     </div>
   </div>
 </div>
@@ -248,587 +259,136 @@ table.dt{width:100%;border-collapse:collapse}
 <!-- MAIN -->
 <div id="main">
   <div class="topbar">
-    <div class="tb-title" id="tb-title">Dashboard</div>
+    <div style="display:flex;align-items:center"><button class="menu-toggle" id="menu-toggle" aria-label="Menu">☰</button><div class="tb-title" id="tb-title">Dashboard</div></div>
     <div class="tb-right">
-      <div class="tb-stat"><div class="tb-val" id="tb-listings">—</div><div class="tb-lbl">Active Listings</div></div>
+      <div class="tb-stat"><div class="tb-val" id="tb-listings">—</div><div class="tb-lbl">Active listings</div></div>
       <div class="tb-sep"></div>
-      <div class="tb-stat"><div class="tb-val" id="tb-appts">—</div><div class="tb-lbl">Pending Appts</div></div>
+      <div class="tb-stat"><div class="tb-val" id="tb-appts">—</div><div class="tb-lbl">Pending appts</div></div>
       <div class="tb-sep"></div>
-      <a href="index.html" class="back-btn">← Back to Website</a>
+      <a href="/" class="back-btn" target="_blank" rel="noopener">View website ↗</a>
     </div>
   </div>
 
   <div class="content">
-
-    <!-- ─── DASHBOARD PAGE ─── -->
-    <div class="page active" id="page-dashboard">
+    <!-- DASHBOARD -->
+    <div class="page" id="page-dashboard">
       <div class="kpi-grid">
-        <div class="kpi" style="--kc:var(--gold);--kb:var(--gold-pale)">
-          <div class="kpi-ico">🏠</div><div class="kpi-val" id="k-total">0</div>
-          <div class="kpi-lbl">Total Properties</div><div class="kpi-sub">All listings</div>
-        </div>
-        <div class="kpi" style="--kc:var(--green);--kb:var(--green-bg)">
-          <div class="kpi-ico">✅</div><div class="kpi-val" id="k-avail">0</div>
-          <div class="kpi-lbl">Available</div><div class="kpi-sub" style="color:var(--green)">Active listings</div>
-        </div>
-        <div class="kpi" style="--kc:var(--red);--kb:var(--red-bg)">
-          <div class="kpi-ico">📅</div><div class="kpi-val" id="k-appts">0</div>
-          <div class="kpi-lbl">Appointments</div><div class="kpi-sub" style="color:var(--red)">Needs review</div>
-        </div>
-        <div class="kpi" style="--kc:var(--blue);--kb:var(--blue-bg)">
-          <div class="kpi-ico">🤝</div><div class="kpi-val" id="k-closed">0</div>
-          <div class="kpi-lbl">Sold / Rented</div><div class="kpi-sub" style="color:var(--blue)">Closed deals</div>
-        </div>
+        <div class="kpi" style="--kc:var(--gold);--kb:var(--gold-pale)"><div class="kpi-ico">🏠</div><div class="kpi-val" id="k-total">0</div><div class="kpi-lbl">Total properties</div><div class="kpi-sub">All listings</div></div>
+        <div class="kpi" style="--kc:var(--green);--kb:var(--green-bg)"><div class="kpi-ico">✅</div><div class="kpi-val" id="k-avail">0</div><div class="kpi-lbl">Available</div><div class="kpi-sub" style="color:var(--green)">Live on website</div></div>
+        <div class="kpi" style="--kc:var(--red);--kb:var(--red-bg)"><div class="kpi-ico">📅</div><div class="kpi-val" id="k-appts">0</div><div class="kpi-lbl">Pending appointments</div><div class="kpi-sub" style="color:var(--red)">Need confirming</div></div>
+        <div class="kpi" style="--kc:var(--blue);--kb:var(--blue-bg)"><div class="kpi-ico">🤝</div><div class="kpi-val" id="k-closed">0</div><div class="kpi-lbl">Sold / rented</div><div class="kpi-sub" style="color:var(--blue)">Closed deals</div></div>
       </div>
       <div class="dash-grid">
         <div class="card">
-          <div class="card-head">
-            <h3>Recent Appointments</h3>
-            <button class="btn btn-sm btn-teal" onclick="goPage('appointments')">View All →</button>
-          </div>
-          <div class="card-body" id="dash-appts"><div class="empty"><div class="empty-ico">📭</div><p>No appointments yet</p></div></div>
+          <div class="card-head"><h3>Upcoming appointments</h3><a class="btn btn-sm btn-teal" href="#appointments">View all →</a></div>
+          <div class="card-body" id="dash-appts"></div>
         </div>
-        <div class="card">
-          <div class="card-head"><h3>Portfolio Breakdown</h3></div>
-          <div class="card-body" id="dash-breakdown"></div>
-        </div>
+        <div class="card"><div class="card-head"><h3>Portfolio breakdown</h3></div><div class="card-body" id="dash-breakdown"></div></div>
       </div>
     </div>
 
-    <!-- ─── PROPERTIES PAGE ─── -->
+    <!-- PROPERTIES -->
     <div class="page" id="page-properties">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
-        <div>
-          <h2 style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:400">All Properties</h2>
-          <p style="color:var(--text-light);font-size:13px;margin-top:4px">Manage your property listings</p>
-        </div>
-        <button class="btn btn-gold" onclick="goPage('add')">➕ Add New Property</button>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;gap:12px;flex-wrap:wrap">
+        <div><h2 style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:400">All properties</h2>
+          <p style="color:var(--text-light);font-size:13px;margin-top:4px">Edit, mark as sold/rented, or remove listings</p></div>
+        <a class="btn btn-gold" href="#edit">➕ Add new property</a>
       </div>
-      <div class="card">
-        <div class="card-body" style="padding:0">
-          <div class="tbl-wrap">
-            <table class="dt">
-              <thead><tr>
-                <th>Property</th><th>ID</th><th>Location</th><th>Type</th><th>Category</th>
-                <th>Price</th><th>Area</th><th>Status</th><th>Actions</th>
-              </tr></thead>
-              <tbody id="props-body"></tbody>
-            </table>
-          </div>
-        </div>
-      </div>
+      <div class="card"><div class="card-body" style="padding:0"><div class="tbl-wrap">
+        <table class="dt">
+          <thead><tr><th>Property</th><th>ID</th><th>Location</th><th>Type</th><th>Price</th><th>Photos</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="props-body"></tbody>
+        </table>
+      </div></div></div>
     </div>
 
-    <!-- ─── ADD PROPERTY PAGE ─── -->
-    <div class="page" id="page-add">
+    <!-- ADD / EDIT PROPERTY -->
+    <div class="page" id="page-edit">
       <div style="margin-bottom:24px">
-        <h2 style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:400">Add New Property</h2>
-        <p style="color:var(--text-light);font-size:13px;margin-top:4px">Fill in the details below to publish a new listing</p>
+        <h2 style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:400" id="edit-title">Add new property</h2>
+        <p style="color:var(--text-light);font-size:13px;margin-top:4px" id="edit-sub">Fill in the details below to publish a new listing</p>
       </div>
-      <div class="card">
-        <div class="card-body">
-          <div class="form-grid">
-            <div class="fg"><label>Property Title *</label><input type="text" id="a-title" placeholder="e.g. Luxury Villa – DHA Phase 6"></div>
-            <div class="fg"><label>Location / Area *</label><input type="text" id="a-location" placeholder="e.g. DHA Phase 6, Lahore"></div>
-            <div class="fg"><label>Listing Type *</label>
-              <select id="a-type"><option value="FOR SALE">For Sale</option><option value="FOR RENT">For Rent</option></select>
-            </div>
-            <div class="fg"><label>Category</label>
-              <select id="a-cat"><option>Residential</option><option>Commercial</option><option>Apartment</option><option>Plot</option></select>
-            </div>
-            <div class="fg"><label>Price *</label><input type="text" id="a-price" placeholder="e.g. PKR 8.5 Crore or PKR 2.5 Lac/mo"></div>
-            <div class="fg"><label>Area (sqft)</label><input type="text" id="a-area" placeholder="e.g. 4500"></div>
-            <div class="fg"><label>Bedrooms</label><input type="number" id="a-beds" min="0" placeholder="4"></div>
-            <div class="fg"><label>Bathrooms</label><input type="number" id="a-baths" min="0" placeholder="3"></div>
-            <div class="fg"><label>Floor / Level</label><input type="text" id="a-floor" placeholder="e.g. G+1 or 8th Floor"></div>
-            <div class="fg"><label>Image URL</label><input type="text" id="a-img" placeholder="https://images.unsplash.com/..."></div>
-            <div class="fg full"><label>Description</label><textarea id="a-desc" placeholder="Describe the property — key features, amenities, neighbourhood..."></textarea></div>
-          </div>
-          <div style="margin-top:22px;display:flex;gap:12px;flex-wrap:wrap">
-            <button class="btn btn-teal" onclick="addProperty()">✓ Publish Property</button>
-            <button class="btn btn-ghost" onclick="clearAddForm()">✕ Clear Form</button>
-          </div>
+      <form class="card" id="prop-form" novalidate><div class="card-body">
+        <div class="form-grid">
+          <div class="fg"><label for="a-title">Property title *</label><input id="a-title" name="title" maxlength="120" required placeholder="e.g. Luxury Villa – DHA Phase 6"></div>
+          <div class="fg"><label for="a-location">Location / area *</label><input id="a-location" name="location" maxlength="160" required placeholder="e.g. DHA Phase 6, Lahore"><div class="hint">End with the city, e.g. "Gulberg III, Lahore"</div></div>
+          <div class="fg"><label for="a-city">City</label><input id="a-city" name="city" maxlength="60" placeholder="Filled from location if empty"></div>
+          <div class="fg"><label for="a-type">Listing type *</label><select id="a-type" name="type"><option value="FOR SALE">For sale</option><option value="FOR RENT">For rent</option></select></div>
+          <div class="fg"><label for="a-cat">Category</label><select id="a-cat" name="category"><option>Residential</option><option>Commercial</option><option>Apartment</option><option>Plot</option></select></div>
+          <div class="fg"><label for="a-price">Price in PKR *</label><input id="a-price" name="price_pkr" inputmode="numeric" required placeholder="e.g. 85000000 or 8.5 crore"><div class="price-preview" id="price-preview"></div></div>
+          <div class="fg"><label for="a-area">Area (sq ft)</label><input id="a-area" name="area" inputmode="numeric" placeholder="e.g. 4500"></div>
+          <div class="fg"><label for="a-floor">Floors / level</label><input id="a-floor" name="floor" maxlength="30" placeholder="e.g. G+1 or 8th Floor"></div>
+          <div class="fg"><label for="a-beds">Bedrooms</label><input id="a-beds" name="beds" type="number" min="0" max="50"></div>
+          <div class="fg"><label for="a-baths">Bathrooms</label><input id="a-baths" name="baths" type="number" min="0" max="50"></div>
+          <div class="fg" id="status-wrap" hidden><label for="a-status">Status</label><select id="a-status" name="status"><option value="available">Available</option><option value="sold">Sold</option><option value="rented">Rented</option></select></div>
+          <div class="fg full"><label for="a-images">Photo URLs (one per line, first = cover photo)</label>
+            <textarea id="a-images" name="images" rows="4" placeholder="https://…/front.jpg&#10;https://…/kitchen.jpg"></textarea>
+            <div class="hint">Upload photos to Cloudinary, Google Photos (public link) or similar, then paste the image links here.</div>
+            <div class="img-previews" id="img-previews"></div></div>
+          <div class="fg full"><label for="a-desc">Description</label><textarea id="a-desc" name="desc" maxlength="4000" placeholder="Key features, amenities, neighbourhood…"></textarea></div>
         </div>
-      </div>
+        <div class="login-err" id="prop-err" role="alert" style="text-align:left;margin-top:16px"></div>
+        <div style="margin-top:22px;display:flex;gap:12px;flex-wrap:wrap">
+          <button class="btn btn-teal" type="submit" id="prop-submit">✓ Publish property</button>
+          <button class="btn btn-ghost" type="button" id="prop-cancel">Cancel</button>
+        </div>
+      </div></form>
     </div>
 
-    <!-- ─── APPOINTMENTS PAGE ─── -->
+    <!-- APPOINTMENTS -->
     <div class="page" id="page-appointments">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px">
-        <div>
-          <h2 style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:400">Booked Appointments</h2>
-          <p style="color:var(--text-light);font-size:13px;margin-top:4px" id="appt-sub">Manage client appointment requests</p>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+        <div><h2 style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:400">Appointments</h2>
+          <p style="color:var(--text-light);font-size:13px;margin-top:4px" id="appt-sub"></p></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-ghost" id="export-csv">⬇ Export CSV</button>
+          <button class="btn btn-red" id="clear-all">🗑 Delete all</button>
         </div>
-        <button class="btn btn-red" onclick="clearAllAppts()">🗑 Clear All</button>
       </div>
-      <div id="appt-container"><div class="empty"><div class="empty-ico">📭</div><p>No appointments booked yet.<br>When clients book via the website, they will appear here.</p></div></div>
+      <div class="tabs" id="appt-tabs" style="margin-bottom:20px">
+        <button class="tab" data-filter="pending" aria-pressed="true">Pending</button>
+        <button class="tab" data-filter="confirmed" aria-pressed="false">Confirmed</button>
+        <button class="tab" data-filter="past" aria-pressed="false">Past</button>
+        <button class="tab" data-filter="all" aria-pressed="false">All</button>
+      </div>
+      <div id="appt-container"></div>
     </div>
 
-    <!-- ─── CALENDAR PAGE ─── -->
+    <!-- CALENDAR -->
     <div class="page" id="page-calendar">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px">
-        <div>
-          <h2 style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:400">Appointments Calendar</h2>
-          <p style="color:var(--text-light);font-size:13px;margin-top:4px" id="cal-sub">Confirmed appointments overview</p>
-        </div>
+        <div><h2 style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:400">Appointments calendar</h2>
+          <p style="color:var(--text-light);font-size:13px;margin-top:4px" id="cal-sub"></p></div>
         <div style="display:flex;gap:10px;align-items:center">
-          <button class="btn btn-ghost" onclick="calNav(-1)">‹ Prev</button>
+          <button class="btn btn-ghost" data-cal="-1">‹ Prev</button>
           <span id="cal-month-label" style="font-weight:600;font-size:15px;min-width:140px;text-align:center"></span>
-          <button class="btn btn-ghost" onclick="calNav(1)">Next ›</button>
+          <button class="btn btn-ghost" data-cal="1">Next ›</button>
         </div>
       </div>
       <div class="card" style="padding:0;overflow:hidden">
-        <div id="cal-grid" style="display:grid;grid-template-columns:repeat(7,1fr);border-bottom:1px solid var(--border)">
-          <div class="cal-hdr">Sun</div><div class="cal-hdr">Mon</div><div class="cal-hdr">Tue</div>
-          <div class="cal-hdr">Wed</div><div class="cal-hdr">Thu</div><div class="cal-hdr">Fri</div><div class="cal-hdr">Sat</div>
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);border-bottom:1px solid var(--border)">
+          <div class="cal-hdr">Sun</div><div class="cal-hdr">Mon</div><div class="cal-hdr">Tue</div><div class="cal-hdr">Wed</div><div class="cal-hdr">Thu</div><div class="cal-hdr">Fri</div><div class="cal-hdr">Sat</div>
         </div>
         <div id="cal-body" style="display:grid;grid-template-columns:repeat(7,1fr)"></div>
       </div>
       <div id="cal-detail" style="margin-top:20px"></div>
     </div>
 
-  </div><!-- /content -->
-</div><!-- /main -->
+    <!-- SETTINGS -->
+    <div class="page" id="page-settings">
+      <h2 style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:400;margin-bottom:20px">Settings</h2>
+      <form class="card" id="pw-form" style="max-width:520px"><div class="card-head"><h3>Change password</h3></div><div class="card-body">
+        <div class="fg" style="margin-bottom:14px"><label for="pw-cur">Current password</label><input type="password" id="pw-cur" autocomplete="current-password" required></div>
+        <div class="fg" style="margin-bottom:14px"><label for="pw-new">New password</label><input type="password" id="pw-new" autocomplete="new-password" minlength="10" required><div class="hint">At least 10 characters.</div></div>
+        <div class="fg" style="margin-bottom:14px"><label for="pw-new2">Repeat new password</label><input type="password" id="pw-new2" autocomplete="new-password" required></div>
+        <div class="login-err" id="pw-err" role="alert" style="text-align:left;margin:0 0 14px"></div>
+        <button class="btn btn-teal" type="submit">Update password</button>
+      </div></form>
+    </div>
+  </div>
+</div>
 
-<div class="toast" id="toast"><span id="ti">✓</span><span id="tm">Done!</span></div>
-
-<script>
-// ─── STATE ────────────────────────────────────────────────────────────────────
-const API='/api';
-let token=null, useAPI=false, nextId=7;
-
-// Generate formatted property ID: S0001 (sale), R0001 (rent), C0001 (commercial)
-function genPropId(type, category){
-  const prefix = category==='Commercial' ? 'C' : (type==='FOR RENT' ? 'R' : 'S');
-  const existing = properties.filter(p=>p.id && p.id.startsWith(prefix));
-  const nums = existing.map(p=>parseInt(p.id.slice(1))||0);
-  const next = nums.length ? Math.max(...nums)+1 : 1;
-  return prefix + String(next).padStart(4,'0');
-}
-let properties=[
-  {id:'S0001',title:"Luxury Villa – DHA Phase 8",location:"DHA Phase 8, Karachi",type:"FOR SALE",category:"Residential",price:"PKR 12 Crore",area:"6000",beds:6,baths:5,floor:"G+1",status:"available",img:"https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=400"},
-  {id:'S0002',title:"Bahria Town Residence",location:"Bahria Town, Islamabad",type:"FOR SALE",category:"Residential",price:"PKR 8.5 Crore",area:"5000",beds:5,baths:4,floor:"G+1",status:"available",img:"https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400"},
-  {id:'R0001',title:"Luxury Apartment – Gulberg",location:"Gulberg III, Lahore",type:"FOR RENT",category:"Apartment",price:"PKR 2.5 Lac/mo",area:"2200",beds:3,baths:3,floor:"8th",status:"available",img:"https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=400"},
-  {id:'R0002',title:"Family Home – Model Town",location:"Model Town, Lahore",type:"FOR RENT",category:"Residential",price:"PKR 1.8 Lac/mo",area:"3800",beds:4,baths:3,floor:"G+1",status:"available",img:"https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=400"},
-  {id:'R0003',title:"Studio Apartment – MM Alam",location:"MM Alam Road, Lahore",type:"FOR RENT",category:"Apartment",price:"PKR 60K/mo",area:"900",beds:1,baths:1,floor:"4th",status:"available",img:"https://images.unsplash.com/photo-1554995207-c18c203602cb?w=400"},
-  {id:'C0001',title:"Commercial Plaza – Main Blvd",location:"Main Boulevard, Lahore",type:"FOR SALE",category:"Commercial",price:"PKR 25 Crore",area:"12000",beds:0,baths:8,floor:"G+3",status:"available",img:"https://images.unsplash.com/photo-1486325212027-8081e485255e?w=400"}
-];
-let appointments=[];
-
-// ─── LOCALSTORAGE BRIDGE (Netlify / no-backend fallback) ─────────────────────
-// Shared keys with index.html so appointments booked on the site appear here.
-const LS_APPTS = 'mc_appointments';
-const LS_PROPS = 'mc_properties';
-
-function lsSaveAppts(){ try{localStorage.setItem(LS_APPTS,JSON.stringify(appointments));}catch{} }
-function lsSaveProps(){ try{localStorage.setItem(LS_PROPS,JSON.stringify(properties));}catch{} }
-
-// Returns true if the appointment date is strictly before today (date has fully passed)
-function isPast(a){
-  if(!a.date) return false;
-  const today=new Date(); today.setHours(0,0,0,0);
-  const d=new Date(a.date+'T00:00:00');
-  return d < today;
-}
-// Active appointments = not past
-function activeAppts(){ return appointments.filter(a=>!isPast(a)); }
-// Purge expired appointments from storage silently on load
-function purgePastAppts(){
-  const before=appointments.length;
-  appointments=appointments.filter(a=>!isPast(a));
-  if(appointments.length!==before) lsSaveAppts();
-}
-function lsLoad(){
-  try{
-    const a=localStorage.getItem(LS_APPTS); if(a) appointments=JSON.parse(a);
-    const p=localStorage.getItem(LS_PROPS); if(p){ const saved=JSON.parse(p); if(saved.length) properties=saved; }
-  }catch{}
-}
-
-// ─── AUTH ─────────────────────────────────────────────────────────────────────
-async function doLogin(){
-  const u=document.getElementById('l-user').value.trim();
-  const p=document.getElementById('l-pass').value.trim();
-  const err=document.getElementById('login-err');
-  err.style.display='none';
-  // Try API
-  try{
-    const r=await fetch(API+'/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p}),signal:AbortSignal.timeout(5000)});
-    if(r.ok){const d=await r.json();token=d.token;useAPI=true;sessionStorage.setItem('mc_tok',token);apiMode(true);enter();await pullFromAPI();return;}
-    err.textContent='Invalid username or password. Please try again.';
-    err.style.display='block';
-  }catch{
-    err.textContent='Could not reach the server. Please check your connection and try again.';
-    err.style.display='block';
-  }
-}
-function enter(){document.getElementById('login-screen').style.display='none';renderAll();}
-function forceLogout(){
-  sessionStorage.removeItem('mc_tok');
-  token=null; useAPI=false;
-  document.getElementById('login-screen').style.display='flex';
-  document.getElementById('l-pass').value='';
-  document.getElementById('login-err').style.display='none';
-}
-function logout(){
-  if(!confirm('Are you sure you want to log out?')) return;
-  forceLogout();
-  toast('👋 Logged out successfully.');
-}
-function apiMode(on){
-  document.getElementById('api-dot').className='api-dot'+(on?' on':'');
-  document.getElementById('api-txt').textContent=on?'API connected':'Demo mode';
-}
-async function pullFromAPI(){
-  try{
-    properties=await apiFetch('/admin/properties');
-    appointments=await apiFetch('/admin/appointments');
-    renderAll();
-  }catch{}
-}
-
-// ─── API HELPERS ──────────────────────────────────────────────────────────────
-async function apiFetch(path,opts={}){
-  const r=await fetch(API+path,{...opts,headers:{...(opts.headers||{}),'x-admin-token':token,'Content-Type':'application/json'}});
-  if(!r.ok)throw new Error(await r.text());
-  return r.json();
-}
-
-// ─── NAVIGATION ───────────────────────────────────────────────────────────────
-const pageNames={dashboard:'Dashboard',properties:'Property Listings',add:'Add New Property',appointments:'Booked Appointments'};
-function goPage(id){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.getElementById('page-'+id).classList.add('active');
-  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  const items=document.querySelectorAll('.nav-item');
-  const map={dashboard:0,properties:1,add:2,appointments:3};
-  if(items[map[id]])items[map[id]].classList.add('active');
-  document.getElementById('tb-title').textContent=pageNames[id]||id;
-  if(id==='properties')renderPropsTable();
-  if(id==='appointments')renderAppts();
-  if(id==='dashboard')renderDashboard();
-  if(id==='calendar')renderCalendar();
-}
-
-// ─── RENDER ───────────────────────────────────────────────────────────────────
-function renderAll(){renderDashboard();renderPropsTable();renderAppts();updateTopbar();}
-
-function updateTopbar(){
-  const avail=properties.filter(p=>p.status==='available').length;
-  const active=activeAppts();
-  const pending=active.filter(a=>!a.confirmed).length;
-  document.getElementById('tb-listings').textContent=avail;
-  document.getElementById('tb-appts').textContent=pending;
-  const b=document.getElementById('appt-badge');
-  b.textContent=pending;
-  b.style.display=pending>0?'inline':'none';
-}
-
-function renderDashboard(){
-  const tot=properties.length,avail=properties.filter(p=>p.status==='available').length;
-  const closed=properties.filter(p=>p.status!=='available').length;
-  const active=activeAppts();
-  document.getElementById('k-total').textContent=tot;
-  document.getElementById('k-avail').textContent=avail;
-  document.getElementById('k-appts').textContent=active.length;
-  document.getElementById('k-closed').textContent=closed;
-  // Recent appts
-  const da=document.getElementById('dash-appts');
-  if(!active.length){da.innerHTML='<div class="empty"><div class="empty-ico">📭</div><p>No upcoming appointments</p></div>';} 
-  else{
-    da.innerHTML=[...active].slice(-6).reverse().map(a=>`
-      <div class="mini-appt">
-        <div><div class="ma-name">${a.name}</div><div class="ma-info">${a.purpose} · ${a.phone}</div>${a.propertyId?`<div style="font-size:11px;font-weight:700;color:#8a5f00;margin-top:2px">🏠 Prop #${a.propertyId} — ${esc(a.propertyName||'')}` :''}${a.propertyId?'</div>':''}</div>
-        <div><div class="ma-date">📅 ${a.date}</div><span class="badge ${a.confirmed?'available':'new'}">${a.confirmed?'Confirmed':'Pending'}</span></div>
-      </div>`).join('');
-  }
-  // Breakdown bars
-  const items=[
-    {label:'For Sale',count:properties.filter(p=>p.type==='FOR SALE').length,color:'#c9a84c'},
-    {label:'For Rent',count:properties.filter(p=>p.type==='FOR RENT').length,color:'#1a3a4a'},
-    {label:'Residential',count:properties.filter(p=>p.category==='Residential').length,color:'#2e7d32'},
-    {label:'Commercial',count:properties.filter(p=>p.category==='Commercial').length,color:'#c0392b'},
-    {label:'Apartment',count:properties.filter(p=>p.category==='Apartment').length,color:'#1565c0'},
-    {label:'Available',count:avail,color:'#2e7d32'},
-    {label:'Closed',count:closed,color:'#888'},
-  ];
-  document.getElementById('dash-breakdown').innerHTML=items.map(it=>`
-    <div class="bar-row">
-      <div class="bar-top"><span>${it.label}</span><span style="font-weight:600">${it.count}</span></div>
-      <div class="bar-track"><div class="bar-fill" style="width:${tot?Math.round(it.count/tot*100):0}%;background:${it.color}"></div></div>
-    </div>`).join('');
-}
-
-function renderPropsTable(){
-  const tbody=document.getElementById('props-body');
-  if(!properties.length){tbody.innerHTML=`<tr><td colspan="9"><div class="empty"><div class="empty-ico">🏠</div><p>No properties yet. Add your first listing!</p></div></td></tr>`;return;}
-  tbody.innerHTML=properties.map(p=>`
-    <tr>
-      <td><div style="display:flex;align-items:center;gap:12px">
-        <img class="prop-thumb" src="${p.img}" alt="" onerror="this.style.display='none'">
-        <strong style="font-size:13px;max-width:180px;display:block">${p.title}</strong>
-      </div></td>
-      <td><span style="display:inline-block;background:linear-gradient(135deg,rgba(201,168,76,.12),rgba(201,168,76,.06));border:1px solid rgba(201,168,76,.35);border-radius:6px;padding:3px 10px;font-size:12px;font-weight:700;color:#8a5f00;letter-spacing:.02em;white-space:nowrap">#${p.id}</span></td>
-      <td style="font-size:12px;color:var(--text-mid)">📍 ${p.location}</td>
-      <td><span class="badge ${p.type==='FOR SALE'?'sale':'rent'}">${p.type}</span></td>
-      <td style="font-size:12px">${p.category}</td>
-      <td style="font-weight:600;font-size:13px">${p.price}</td>
-      <td style="font-size:12px">${p.area||'—'} sqft</td>
-      <td><span class="badge ${p.status}">${p.status}</span></td>
-      <td>
-        <div style="display:flex;gap:6px">
-          ${p.status==='available'
-            ?`<button class="btn btn-sm btn-gold" onclick="setStatus('${p.id}','sold')">Sold</button>
-               <button class="btn btn-sm btn-teal" onclick="setStatus('${p.id}','rented')">Rented</button>`
-            :`<button class="btn btn-sm btn-teal" onclick="setStatus('${p.id}','available')">Re-list</button>`}
-          <button class="btn btn-sm btn-red" onclick="delProp('${p.id}')">🗑</button>
-        </div>
-      </td>
-    </tr>`).join('');
-}
-
-function renderAppts(){
-  const c=document.getElementById('appt-container');
-  const active=activeAppts();
-  const pending=active.filter(a=>!a.confirmed);
-  const confirmedCount=active.filter(a=>a.confirmed).length;
-  document.getElementById('appt-sub').textContent=active.length
-    ? `${pending.length} pending · ${confirmedCount} confirmed (see Calendar)`
-    : 'Manage client appointment requests';
-  if(!pending.length){
-    c.innerHTML=`<div class="empty"><div class="empty-ico">${confirmedCount>0?'✅':'📭'}</div><p>${confirmedCount>0?`All ${confirmedCount} appointment${confirmedCount!==1?'s':''} confirmed! View them in the <a onclick="goPage('calendar')" style="color:var(--gold);cursor:pointer">Calendar</a>.`:'No pending appointments.<br>When clients book via the website, they will appear here.'}</p></div>`;
-    updateTopbar();return;
-  }
-  // Only show pending (not yet confirmed) appointments
-  c.innerHTML='<div class="appt-grid-cards">'+pending.map((a)=>{
-    const realIdx=appointments.indexOf(a);
-    return `<div class="appt-card">
-      <div class="ac-name">${esc(a.name)}<span class="badge new">Pending</span></div>
-      <div style="background:${a.propertyId?'linear-gradient(135deg,#fffbef,#fff8e1)':'linear-gradient(135deg,#f5f5f5,#fafafa)'};border:2px solid ${a.propertyId?'#f0c040':'#ddd'};border-radius:10px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px">
-        <span style="font-size:20px">🏠</span>
-        <div>
-          <div style="font-size:10px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.08em">Property Enquiry</div>
-          ${a.propertyId
-            ? `<div style="font-size:14px;font-weight:700;color:#8a5f00;margin-top:1px">ID #${esc(a.propertyId)} &nbsp;—&nbsp; ${esc(a.propertyName||'Unknown Property')}</div>`
-            : `<div style="font-size:13px;color:#aaa;margin-top:1px;font-style:italic">General enquiry (no specific property)</div>`
-          }
-        </div>
-      </div>
-      <div class="ac-detail"><span>📧</span>${esc(a.email)}</div>
-      <div class="ac-detail"><span>📞</span>${esc(a.phone)}</div>
-      <div class="ac-detail"><span>🎯</span>${esc(a.purpose)}</div>
-      ${a.msg?`<div class="ac-msg">"${esc(a.msg)}"</div>`:''}
-      <div class="ac-foot">
-        <div><div class="ac-date">📅 ${a.date}</div><div class="ac-time">🕐 ${a.time||'TBD'}</div></div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <button class="btn btn-sm btn-gold" onclick="confirmAppt('${a.id||''}',${realIdx})">✓ Confirm</button>
-          <a class="btn btn-sm btn-wa" href="${waRescheduleLink(a)}" target="_blank" rel="noopener" title="Ask to reschedule — removes request" onclick="setTimeout(()=>rescheduleAppt('${a.id||''}',${realIdx}),400)" style="background:#fff8e1;color:#8a5f00;border-color:#f0d080">
-            <svg viewBox="0 0 32 32" style="width:12px;height:12px;fill:currentColor"><path d="M16 .5C7.44.5.5 7.44.5 16c0 2.72.7 5.28 1.94 7.5L.5 31.5l8.24-1.9A15.45 15.45 0 0016 31.5C24.56 31.5 31.5 24.56 31.5 16S24.56.5 16 .5zm7.58 18.49c-.41-.21-2.44-1.2-2.82-1.34-.38-.14-.65-.2-.93.21-.27.41-1.06 1.34-1.3 1.62-.24.27-.48.3-.89.1-.41-.21-1.74-.64-3.32-2.04-1.22-1.09-2.05-2.44-2.29-2.85-.24-.41-.03-.63.18-.84.19-.18.41-.48.62-.72.2-.24.27-.41.41-.69.14-.27.07-.52-.03-.72-.1-.21-.93-2.24-1.27-3.07-.34-.8-.68-.69-.93-.7h-.8c-.27 0-.72.1-1.1.52-.38.41-1.44 1.41-1.44 3.44s1.48 3.99 1.68 4.27c.21.27 2.9 4.43 7.03 6.21.98.42 1.75.68 2.35.87.99.31 1.89.27 2.6.16.79-.12 2.44-1 2.78-1.96.34-.96.34-1.79.24-1.96-.1-.17-.38-.27-.79-.48z"/></svg>
-            Reschedule
-          </a>
-          <button class="btn btn-sm btn-red" onclick="delAppt('${a.id||''}',${realIdx})">Dismiss</button>
-        </div>
-      </div>
-    </div>`;}).join('')+'</div>';
-  updateTopbar();
-}
-
-// ─── ACTIONS ──────────────────────────────────────────────────────────────────
-async function addProperty(){
-  const title=v('a-title'),location=v('a-location'),price=v('a-price');
-  if(!title||!location||!price){toast('⚠️ Title, Location & Price are required.');return;}
-  const type=v('a-type'), category=v('a-cat');
-  const prop={id:genPropId(type,category),title,location,type,category,price,area:v('a-area'),beds:parseInt(v('a-beds'))||0,baths:parseInt(v('a-baths'))||0,floor:v('a-floor'),img:v('a-img')||'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400',desc:v('a-desc'),status:'available',createdAt:new Date().toISOString()};
-  if(useAPI){try{const r=await apiFetch('/admin/properties',{method:'POST',body:JSON.stringify(prop)});prop.id=r.id;}catch{toast('⚠️ API error — saved locally.');}}
-  properties.push(prop);
-  if(!useAPI) lsSaveProps();
-  clearAddForm();
-  toast('✅ Property published successfully!');
-  renderAll();goPage('properties');
-}
-function clearAddForm(){['a-title','a-location','a-price','a-area','a-beds','a-baths','a-floor','a-img','a-desc'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';})}
-async function setStatus(id,status){
-  const p=properties.find(x=>x.id==id);if(!p)return;p.status=status;
-  if(useAPI){try{await apiFetch('/admin/properties/'+id,{method:'PATCH',body:JSON.stringify({status})});}catch{}}
-  if(!useAPI) lsSaveProps();
-  renderAll();toast(`✅ Marked as ${status}.`);
-}
-async function delProp(id){
-  if(!confirm('Remove this listing permanently?'))return;
-  properties=properties.filter(x=>x.id!=id);
-  if(useAPI){try{await apiFetch('/admin/properties/'+id,{method:'DELETE'});}catch{}}
-  if(!useAPI) lsSaveProps();
-  renderAll();toast('🗑 Property removed.');
-}
-async function delAppt(id,idx){
-  appointments.splice(idx,1);
-  lsSaveAppts(); // always save immediately
-  if(useAPI&&id){try{await apiFetch('/admin/appointments/'+id,{method:'DELETE'});}catch{}}
-  renderAppts();updateTopbar();toast('🗑 Appointment dismissed.');
-}
-async function confirmAppt(id,idx){
-  const a=appointments[idx];
-  appointments[idx].confirmed=true;
-  lsSaveAppts(); // always save immediately — before WhatsApp opens and triggers logout
-  if(useAPI&&id){try{await apiFetch('/admin/appointments/'+id,{method:'PATCH',body:JSON.stringify({confirmed:true})});}catch{}}
-  renderAppts();updateTopbar();
-  toast(`✅ Confirmed! Opening WhatsApp to notify ${a.name}…`);
-  setTimeout(()=>window.open(waConfirmLink(a),'_blank','noopener'),800);
-}
-async function rescheduleAppt(id,idx){
-  appointments.splice(idx,1);
-  lsSaveAppts(); // always save immediately
-  if(useAPI&&id){try{await apiFetch('/admin/appointments/'+id,{method:'DELETE'});}catch{}}
-  renderAppts();updateTopbar();
-  toast('🔄 Reschedule message sent. Appointment removed from queue.');
-}
-
-// ─── CALENDAR ────────────────────────────────────────────────────────────────
-let calYear, calMonth;
-(function initCal(){ const n=new Date(); calYear=n.getFullYear(); calMonth=n.getMonth(); })();
-
-function calNav(dir){ calMonth+=dir; if(calMonth>11){calMonth=0;calYear++;} if(calMonth<0){calMonth=11;calYear--;} renderCalendar(); }
-
-function renderCalendar(){
-  const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
-  document.getElementById('cal-month-label').textContent=`${months[calMonth]} ${calYear}`;
-  const confirmed=activeAppts().filter(a=>a.confirmed);
-  document.getElementById('cal-sub').textContent=`${confirmed.length} confirmed appointment${confirmed.length!==1?'s':''} upcoming`;
-
-  const firstDay=new Date(calYear,calMonth,1).getDay();
-  const daysInMonth=new Date(calYear,calMonth+1,0).getDate();
-  const daysInPrev=new Date(calYear,calMonth,0).getDate();
-  const today=new Date();
-
-  let cells='';
-  let dayCount=0;
-  // Fill leading cells from prev month
-  for(let i=firstDay-1;i>=0;i--){ cells+=`<div class="cal-cell other-month"><div class="cal-day-num" style="opacity:.3">${daysInPrev-i}</div></div>`; dayCount++; }
-  // Current month days
-  for(let d=1;d<=daysInMonth;d++){
-    const isToday=(d===today.getDate()&&calMonth===today.getMonth()&&calYear===today.getFullYear());
-    // Find appointments for this date
-    const dateStr=`${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-    const dayAppts=confirmed.filter(a=>a.date===dateStr);
-    cells+=`<div class="cal-cell${isToday?' today':''}">
-      <div class="cal-day-num">${d}</div>
-      ${dayAppts.map(a=>`<div class="cal-appt-dot" onclick="showCalDetail('${a.id||''}')" title="${esc(a.name)}${a.propertyId?' · '+a.propertyId:''}">🕐 ${esc(a.name.split(' ')[0])} ${a.propertyId?'['+a.propertyId+']':''} · ${a.time||'TBD'}</div>`).join('')}
-    </div>`;
-    dayCount++;
-  }
-  // Fill trailing cells
-  let trail=1;
-  while(dayCount%7!==0){ cells+=`<div class="cal-cell other-month"><div class="cal-day-num" style="opacity:.3">${trail++}</div></div>`; dayCount++; }
-  document.getElementById('cal-body').innerHTML=cells;
-  document.getElementById('cal-detail').innerHTML='';
-}
-
-function showCalDetail(id){
-  const a=appointments.find(x=>(x.id||'')=== id);
-  if(!a) return;
-  document.getElementById('cal-detail').innerHTML=`
-    <div class="cal-detail-card">
-      <div style="flex:1">
-        <div style="font-weight:600;font-size:16px">${esc(a.name)}<span class="badge available">✓ Confirmed</span></div>
-        <div style="background:${a.propertyId?'linear-gradient(135deg,#fffbef,#fff8e1)':'#f5f5f5'};border:2px solid ${a.propertyId?'#f0c040':'#ddd'};border-radius:9px;padding:9px 13px;margin-top:10px;display:flex;align-items:center;gap:9px">
-          <span style="font-size:18px">🏠</span>
-          <div>
-            <div style="font-size:10px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.08em">Property</div>
-            ${a.propertyId
-              ? `<div style="font-size:13px;font-weight:700;color:#8a5f00">ID #${esc(a.propertyId)} — ${esc(a.propertyName||'Unknown Property')}</div>`
-              : `<div style="font-size:12px;color:#aaa;font-style:italic">General enquiry</div>`
-            }
-          </div>
-        </div>
-        <div style="color:var(--text-mid);font-size:13px;margin-top:8px">📅 ${a.date} &nbsp; 🕐 ${a.time||'TBD'} &nbsp; 🎯 ${esc(a.purpose)}</div>
-        <div style="color:var(--text-mid);font-size:13px;margin-top:4px">📧 ${esc(a.email)} &nbsp; 📞 ${esc(a.phone)}</div>
-        ${a.msg?`<div style="font-style:italic;color:var(--text-light);font-size:12px;margin-top:6px">"${esc(a.msg)}"</div>`:''}
-      </div>
-      <a class="btn btn-sm btn-wa" href="${waConfirmLink(a)}" target="_blank" rel="noopener" style="white-space:nowrap">
-        <svg viewBox="0 0 32 32" style="width:12px;height:12px;fill:currentColor"><path d="M16 .5C7.44.5.5 7.44.5 16c0 2.72.7 5.28 1.94 7.5L.5 31.5l8.24-1.9A15.45 15.45 0 0016 31.5C24.56 31.5 31.5 24.56 31.5 16S24.56.5 16 .5zm7.58 18.49c-.41-.21-2.44-1.2-2.82-1.34-.38-.14-.65-.2-.93.21-.27.41-1.06 1.34-1.3 1.62-.24.27-.48.3-.89.1-.41-.21-1.74-.64-3.32-2.04-1.22-1.09-2.05-2.44-2.29-2.85-.24-.41-.03-.63.18-.84.19-.18.41-.48.62-.72.2-.24.27-.41.41-.69.14-.27.07-.52-.03-.72-.1-.21-.93-2.24-1.27-3.07-.34-.8-.68-.69-.93-.7h-.8c-.27 0-.72.1-1.1.52-.38.41-1.44 1.41-1.44 3.44s1.48 3.99 1.68 4.27c.21.27 2.9 4.43 7.03 6.21.98.42 1.75.68 2.35.87.99.31 1.89.27 2.6.16.79-.12 2.44-1 2.78-1.96.34-.96.34-1.79.24-1.96-.1-.17-.38-.27-.79-.48z"/></svg>
-        Re-notify on WhatsApp
-      </a>
-    </div>`;
-}
-async function clearAllAppts(){
-  if(!appointments.length){toast('ℹ️ No appointments to clear.');return;}
-  if(!confirm(`Clear all ${appointments.length} appointments?`))return;
-  appointments=[];
-  lsSaveAppts(); // always save immediately
-  if(useAPI){try{await apiFetch('/admin/appointments',{method:'DELETE'});}catch{}}
-  renderAppts();updateTopbar();toast('🗑 All appointments cleared.');
-}
-
-// ─── WHATSAPP HELPERS ─────────────────────────────────────────────────────────
-function waPhone(raw){
-  // Strip spaces, dashes, brackets; ensure country code
-  let n=(raw||'').replace(/[\s\-()]/g,'');
-  if(n.startsWith('0'))n='92'+n.slice(1);
-  if(!n.startsWith('+'))n='+'+n;
-  return n.replace('+','');
-}
-function waConfirmLink(a){
-  const propLine=a.propertyId?`🏠 Property: ${a.propertyName||''} (ID #${a.propertyId})\n`:'';
-  const msg=`Assalam o Alaikum ${a.name}! 🎉\n\nYour appointment with *MidLand Constructions* has been *confirmed*.\n\n📅 Date: ${a.date}\n🕐 Time: ${a.time||'TBD'}\n🎯 Purpose: ${a.purpose}\n${propLine}\nPlease arrive on time. If you need to reschedule, feel free to reply here.\n\n— MidLand Constructions Team`;
-  return `https://wa.me/${waPhone(a.phone)}?text=${encodeURIComponent(msg)}`;
-}
-function waRescheduleLink(a){
-  const msg=`Assalam o Alaikum ${a.name},\n\nThank you for booking with *MidLand Constructions*.\n\nUnfortunately, we're unable to confirm your appointment for *${a.date} at ${a.time||'TBD'}*. We'd like to reschedule at a time that works for you.\n\nPlease reply with your preferred date and time and we'll confirm right away. We apologize for any inconvenience!\n\n— MidLand Constructions Team`;
-  return `https://wa.me/${waPhone(a.phone)}?text=${encodeURIComponent(msg)}`;
-}
-
-// ─── UTILS ────────────────────────────────────────────────────────────────────
-function v(id){return document.getElementById(id)?.value?.trim()||'';}
-function esc(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-let toastT;
-function toast(msg){
-  clearTimeout(toastT);
-  document.getElementById('tm').textContent=msg;
-  const t=document.getElementById('toast');t.classList.add('show');
-  toastT=setTimeout(()=>t.classList.remove('show'),3800);
-}
-
-// ─── SESSION SECURITY ─────────────────────────────────────────────────────────
-// Logout when the user navigates away from admin (not just opens a new tab).
-// We track whether a new tab was opened — if so, skip the logout on hide.
-let _newTabOpened = false;
-
-// Intercept window.open to flag new tab openings
-const _origOpen = window.open.bind(window);
-window.open = function(...args) {
-  _newTabOpened = true;
-  setTimeout(() => { _newTabOpened = false; }, 2000);
-  return _origOpen(...args);
-};
-
-document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'hidden' && token) {
-    if (_newTabOpened) return; // opening WhatsApp / website preview — don't logout
-    forceLogout();
-  }
-});
-
-// Clear session on actual tab close / hard navigation away.
-window.addEventListener('beforeunload', () => {
-  sessionStorage.removeItem('mc_tok');
-});
-
-// ─── INIT ─────────────────────────────────────────────────────────────────────
-// sessionStorage only lives for this single tab — never shared across tabs,
-// never survives a close. No persistent login possible.
-window.addEventListener('load', () => {
-  const saved = sessionStorage.getItem('mc_tok');
-  if (saved) {
-    token = saved;
-    lsLoad(); // always load localStorage data first
-    purgePastAppts(); // remove any appointments whose date has passed
-    document.getElementById('login-screen').style.display = 'none';
-    enter();
-    // Try to upgrade to API — if it works, it overwrites the localStorage data with live data
-    fetch(API + '/admin/properties', {headers: {'x-admin-token': saved}, signal: AbortSignal.timeout(2000)})
-      .then(r => { if (r.ok) { useAPI = true; apiMode(true); pullFromAPI(); } }).catch(() => {});
-  }
-});
-</script>
+<div class="toast" id="toast" role="status" aria-live="polite"><span id="tm"></span></div>
+<script src="/assets/admin.js"></script>
 </body>
 </html>

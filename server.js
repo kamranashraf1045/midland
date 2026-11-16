@@ -1,147 +1,243 @@
 /**
- * ╔══════════════════════════════════════════════════════════════╗
- *   MidLand Constructions — Backend API Server
- *   Node.js + Express + Turso (persistent SQLite-compatible DB)
+ * MidLand Constructions — Backend API Server
+ * Node.js + Express + Turso (persistent SQLite-compatible DB)
  *
- *   HOW TO RUN:
- *     npm install
- *     npm start           ← production
- *     npm run dev         ← development (auto-restart)
+ *   npm install
+ *   npm start        ← production
+ *   npm run dev      ← development (auto-restart)
  *
- *   Website : http://localhost:3001
- *   Admin   : http://localhost:3001/admin.html
- *   Login   : admin / ml@2026   (change this after first login!)
- * ╚══════════════════════════════════════════════════════════════╝
+ * Required env vars in production (see .env.example):
+ *   SESSION_SECRET, ADMIN_PASS (first run only), TURSO_DATABASE_URL, TURSO_AUTH_TOKEN
  */
 
 require('dotenv').config();
-const express    = require('express');
-const cors       = require('cors');
-const bodyParser = require('body-parser');
-const path       = require('path');
-const crypto     = require('crypto');
-const bcrypt     = require('bcryptjs');
+const express = require('express');
+const path    = require('path');
+const crypto  = require('crypto');
+const bcrypt  = require('bcryptjs');
 const { v4: uuidv4 } = require('uuid');
 const { createClient } = require('@libsql/client');
+const { renderPropertyPage, renderNotFound } = require('./views/pages');
+const { parsePrice, formatPrice, cityFromLocation } = require('./lib/price');
 
 const app  = express();
 const PORT = process.env.PORT || 3001;
+const IS_PROD = !!process.env.VERCEL || process.env.NODE_ENV === 'production';
 
-// ─── DATABASE SETUP ───────────────────────────────────────────────────────────
-// Uses Turso (hosted, persistent SQLite) when TURSO_DATABASE_URL is set.
-// Falls back to a local file for local development only — this does NOT
-// persist reliably on Vercel, so production MUST set the Turso env vars.
+// ─── CONFIG ───────────────────────────────────────────────────────────────────
+// Public business details. Set these in Vercel → Environment Variables so the
+// number/email are defined in ONE place and every page picks them up.
+const SITE = {
+  url:      (process.env.SITE_URL || '').replace(/\/$/, ''),
+  whatsapp: process.env.WHATSAPP_NUMBER || '923001234567', // country code, no "+"
+  phone:    process.env.CONTACT_PHONE   || '+92 300 1234567',
+  email:    process.env.CONTACT_EMAIL   || 'info@midlandpk.com',
+  address:  process.env.CONTACT_ADDRESS || 'DHA Phase 6, Lahore',
+  hours:    'Mon–Sat, 9:00 AM – 7:00 PM',
+};
+
+// Session secret: mandatory in production. Locally, a random per-process
+// secret is generated so development "just works" (you'll be logged out on restart).
+let SESSION_SECRET = process.env.SESSION_SECRET;
+if (!SESSION_SECRET || SESSION_SECRET.length < 32) {
+  if (IS_PROD) throw new Error('SESSION_SECRET env var is missing or shorter than 32 characters.');
+  SESSION_SECRET = crypto.randomBytes(32).toString('hex');
+  console.warn('⚠️  SESSION_SECRET not set — using a temporary random secret (dev only).');
+}
+const SESSION_MAX_AGE_MS = 1000 * 60 * 60 * 12; // 12 hours
+
+// ─── DATABASE ─────────────────────────────────────────────────────────────────
 const usingTurso = !!process.env.TURSO_DATABASE_URL;
+if (!usingTurso && IS_PROD) {
+  console.error('❌ TURSO_DATABASE_URL is not set — data will NOT persist on Vercel. See README.md.');
+}
 const db = createClient({
   url: process.env.TURSO_DATABASE_URL || `file:${path.join(__dirname, 'db.sqlite')}`,
   authToken: process.env.TURSO_AUTH_TOKEN,
 });
 
-if (!usingTurso && process.env.VERCEL) {
-  console.warn('⚠️  No TURSO_DATABASE_URL set — data will NOT persist on Vercel. See README.md.');
-}
-
+const U = (id) => `https://images.unsplash.com/${id}?w=1200&q=75&auto=format&fit=crop`;
 const SEED_PROPERTIES = [
-  { id: 'S0001', title: "Luxury Villa – DHA Phase 8", location: "DHA Phase 8, Karachi", type: "FOR SALE", category: "Residential", price: "PKR 12 Crore", area: "6000", beds: 6, baths: 5, floor: "G+1", img: "https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=600", desc: "An exceptional 6,000 sq ft villa set in the heart of DHA Phase 8. Featuring a private swimming pool, home theatre, and an imported Italian kitchen, this residence sits within one of Pakistan's finest gated communities. Complete with 24/7 security, dedicated parking, and a beautifully landscaped garden — a true dream home." },
-  { id: 'S0002', title: "Bahria Town Residence", location: "Bahria Town, Islamabad", type: "FOR SALE", category: "Residential", price: "PKR 8.5 Crore", area: "5000", beds: 5, baths: 4, floor: "G+1", img: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=600", desc: "Set amid Islamabad's scenic hills, this double-storey residence in Bahria Town offers a world of its own. Built with a landscaped garden, underground parking, CCTV surveillance, and premium fixtures throughout, it's designed for families who value both quality and security. Parks, top schools, and shopping malls are all just minutes away." },
-  { id: 'R0001', title: "Luxury Apartment – Gulberg", location: "Gulberg III, Lahore", type: "FOR RENT", category: "Apartment", price: "PKR 2.5 Lac/mo", area: "2200", beds: 3, baths: 3, floor: "8th Floor", img: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600", desc: "This fully furnished luxury apartment is available for rent in Gulberg III — Lahore's most sought-after address. Enjoy breathtaking city views from the 8th floor, a rooftop lounge, a fully equipped gym, and round-the-clock concierge service. For anyone who truly wants to live in the heart of the city, this apartment is the perfect fit." },
-  { id: 'R0002', title: "Family Home – Model Town", location: "Model Town, Lahore", type: "FOR RENT", category: "Residential", price: "PKR 1.8 Lac/mo", area: "3800", beds: 4, baths: 3, floor: "G+1", img: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=600", desc: "A spacious 4-bedroom family home in Model Town Extension, ideal for those seeking a peaceful, secure, and welcoming neighbourhood. Mature trees line the street outside, premium finishes furnish the interior, and parks, schools, and markets are all within easy walking distance." },
-  { id: 'R0003', title: "Studio Apartment – MM Alam", location: "MM Alam Road, Lahore", type: "FOR RENT", category: "Apartment", price: "PKR 60K/mo", area: "900", beds: 1, baths: 1, floor: "4th Floor", img: "https://images.unsplash.com/photo-1554995207-c18c203602cb?w=600", desc: "A modern studio apartment on MM Alam Road — one of Lahore's most vibrant streets — built for young professionals who want to live life on their own terms. Fully furnished with appliances included, and filled with natural light on the 4th floor. Cafes, restaurants, and offices are all close by." },
-  { id: 'C0001', title: "Commercial Plaza – Main Boulevard", location: "Main Boulevard, Lahore", type: "FOR SALE", category: "Commercial", price: "PKR 25 Crore", area: "12000", beds: 0, baths: 8, floor: "G+3", img: "https://images.unsplash.com/photo-1486325212027-8081e485255e?w=600", desc: "A G+3 commercial plaza on Main Boulevard, positioned in one of Pakistan's most prominent business districts. Ground-floor retail space, premium offices on the upper floors, central A/C, full backup power, 3 lifts, and ample parking. A rare opportunity for investors and business owners alike." },
+  { id: 'S0001', title: 'Luxury Villa – DHA Phase 8', location: 'DHA Phase 8, Karachi', type: 'FOR SALE', category: 'Residential', price_pkr: 120000000, area: '6000', beds: 6, baths: 5, floor: 'G+1',
+    images: [U('photo-1613490493576-7fde63acd811'), U('photo-1600607687939-ce8a6c25118c'), U('photo-1600566753086-00f18fb6b3ea'), U('photo-1567767292278-a4f21aa2d36e')],
+    desc: "An exceptional 6,000 sq ft villa in the heart of DHA Phase 8, featuring a private swimming pool, home theatre and an imported Italian kitchen. It sits within a gated community with 24/7 security, dedicated parking and a landscaped garden." },
+  { id: 'S0002', title: 'Bahria Town Residence', location: 'Bahria Town, Islamabad', type: 'FOR SALE', category: 'Residential', price_pkr: 85000000, area: '5000', beds: 5, baths: 4, floor: 'G+1',
+    images: [U('photo-1564013799919-ab600027ffc6'), U('photo-1600585154340-be6161a56a0c')],
+    desc: "A double-storey residence set amid Islamabad's hills, with a landscaped garden, underground parking, CCTV surveillance and premium fixtures throughout. Parks, schools and shopping are minutes away." },
+  { id: 'R0001', title: 'Luxury Apartment – Gulberg', location: 'Gulberg III, Lahore', type: 'FOR RENT', category: 'Apartment', price_pkr: 250000, area: '2200', beds: 3, baths: 3, floor: '8th Floor',
+    images: [U('photo-1502672260266-1c1ef2d93688'), U('photo-1522708323590-d24dbb6b0267')],
+    desc: "A fully furnished apartment in Gulberg III with city views from the 8th floor, a rooftop lounge, a fully equipped gym and round-the-clock concierge service." },
+  { id: 'R0002', title: 'Family Home – Model Town', location: 'Model Town, Lahore', type: 'FOR RENT', category: 'Residential', price_pkr: 180000, area: '3800', beds: 4, baths: 3, floor: 'G+1',
+    images: [U('photo-1600596542815-ffad4c1539a9')],
+    desc: "A spacious 4-bedroom family home in Model Town Extension on a quiet tree-lined street, with premium finishes and parks, schools and markets within walking distance." },
+  { id: 'R0003', title: 'Studio Apartment – MM Alam', location: 'MM Alam Road, Lahore', type: 'FOR RENT', category: 'Apartment', price_pkr: 60000, area: '900', beds: 1, baths: 1, floor: '4th Floor',
+    images: [U('photo-1554995207-c18c203602cb')],
+    desc: "A modern, fully furnished studio on MM Alam Road with appliances included and plenty of natural light. Cafes, restaurants and offices are close by." },
+  { id: 'C0001', title: 'Commercial Plaza – Main Boulevard', location: 'Main Boulevard, Lahore', type: 'FOR SALE', category: 'Commercial', price_pkr: 250000000, area: '12000', beds: 0, baths: 8, floor: 'G+3',
+    images: [U('photo-1486325212027-8081e485255e'), U('photo-1486406146926-c627a92ad1ab')],
+    desc: "A G+3 commercial plaza on Main Boulevard with ground-floor retail, offices above, central A/C, full backup power, 3 lifts and ample parking." },
 ];
+
+async function columnNames(table) {
+  const { rows } = await db.execute(`PRAGMA table_info(${table})`);
+  return rows.map(r => r.name);
+}
 
 async function initDb() {
   await db.execute(`
     CREATE TABLE IF NOT EXISTS properties (
-      id          TEXT PRIMARY KEY,
-      title       TEXT NOT NULL,
-      location    TEXT NOT NULL,
-      type        TEXT NOT NULL,
-      category    TEXT NOT NULL,
-      price       TEXT NOT NULL,
-      area        TEXT DEFAULT '',
-      beds        INTEGER DEFAULT 0,
-      baths       INTEGER DEFAULT 0,
-      floor       TEXT DEFAULT '',
-      img         TEXT DEFAULT '',
-      desc        TEXT DEFAULT '',
-      status      TEXT DEFAULT 'available',
-      createdAt   TEXT DEFAULT (datetime('now'))
-    )
-  `);
+      id TEXT PRIMARY KEY, title TEXT NOT NULL, location TEXT NOT NULL,
+      type TEXT NOT NULL, category TEXT NOT NULL, price TEXT NOT NULL,
+      area TEXT DEFAULT '', beds INTEGER DEFAULT 0, baths INTEGER DEFAULT 0,
+      floor TEXT DEFAULT '', img TEXT DEFAULT '', desc TEXT DEFAULT '',
+      status TEXT DEFAULT 'available', createdAt TEXT DEFAULT (datetime('now'))
+    )`);
   await db.execute(`
     CREATE TABLE IF NOT EXISTS appointments (
-      id            TEXT PRIMARY KEY,
-      name          TEXT NOT NULL,
-      email         TEXT NOT NULL,
-      phone         TEXT NOT NULL,
-      date          TEXT NOT NULL,
-      time          TEXT DEFAULT '',
-      purpose       TEXT DEFAULT 'General Inquiry',
-      msg           TEXT DEFAULT '',
-      propertyId    TEXT DEFAULT '',
-      propertyName  TEXT DEFAULT '',
-      confirmed     INTEGER DEFAULT 0,
-      createdAt     TEXT DEFAULT (datetime('now'))
-    )
-  `);
+      id TEXT PRIMARY KEY, name TEXT NOT NULL, email TEXT NOT NULL, phone TEXT NOT NULL,
+      date TEXT NOT NULL, time TEXT DEFAULT '', purpose TEXT DEFAULT 'General Inquiry',
+      msg TEXT DEFAULT '', propertyId TEXT DEFAULT '', propertyName TEXT DEFAULT '',
+      confirmed INTEGER DEFAULT 0, createdAt TEXT DEFAULT (datetime('now'))
+    )`);
   await db.execute(`
     CREATE TABLE IF NOT EXISTS admins (
-      id            INTEGER PRIMARY KEY AUTOINCREMENT,
-      username      TEXT UNIQUE NOT NULL,
-      password_hash TEXT NOT NULL
-    )
-  `);
+      id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT UNIQUE NOT NULL, password_hash TEXT NOT NULL
+    )`);
+
+  // ── Migrations (safe to run repeatedly) ──
+  const cols = await columnNames('properties');
+  if (!cols.includes('images'))    await db.execute(`ALTER TABLE properties ADD COLUMN images TEXT DEFAULT '[]'`);
+  if (!cols.includes('price_pkr')) await db.execute(`ALTER TABLE properties ADD COLUMN price_pkr INTEGER DEFAULT 0`);
+  if (!cols.includes('city'))      await db.execute(`ALTER TABLE properties ADD COLUMN city TEXT DEFAULT ''`);
+  // Backfill new columns on old rows
+  const { rows: old } = await db.execute(`SELECT id, price, location, img, images, price_pkr, city FROM properties`);
+  for (const r of old) {
+    const imgs = safeJson(r.images, []);
+    const patch = {
+      images: imgs.length ? r.images : JSON.stringify(r.img ? [r.img] : []),
+      price_pkr: r.price_pkr || parsePrice(r.price),
+      city: r.city || cityFromLocation(r.location),
+    };
+    if (patch.images !== r.images || patch.price_pkr !== r.price_pkr || patch.city !== r.city) {
+      await db.execute({ sql: 'UPDATE properties SET images=?, price_pkr=?, city=? WHERE id=?', args: [patch.images, patch.price_pkr, patch.city, r.id] });
+    }
+  }
 
   const { rows: propCount } = await db.execute('SELECT COUNT(*) as count FROM properties');
-  if (propCount[0].count === 0) {
-    for (const p of SEED_PROPERTIES) {
-      await db.execute({
-        sql: `INSERT INTO properties (id, title, location, type, category, price, area, beds, baths, floor, img, desc, status)
-              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'available')`,
-        args: [p.id, p.title, p.location, p.type, p.category, p.price, p.area, p.beds, p.baths, p.floor, p.img, p.desc],
-      });
-    }
+  if (Number(propCount[0].count) === 0) {
+    for (const p of SEED_PROPERTIES) await insertProperty({ ...p, status: 'available' });
     console.log(`🏠 Seeded ${SEED_PROPERTIES.length} starter properties`);
   }
 
   const { rows: adminCount } = await db.execute('SELECT COUNT(*) as count FROM admins');
-  if (adminCount[0].count === 0) {
-    const defaultPass = process.env.ADMIN_PASS || 'ml@2026';
-    const hash = bcrypt.hashSync(defaultPass, 10);
+  if (Number(adminCount[0].count) === 0) {
+    let pass = process.env.ADMIN_PASS;
+    if (!pass) {
+      if (IS_PROD) { console.error('❌ No admin exists and ADMIN_PASS is not set — set it in Vercel and redeploy.'); return; }
+      pass = crypto.randomBytes(9).toString('base64url');
+      console.log(`🔑 Dev admin created → username: ${process.env.ADMIN_USER || 'admin'} | password: ${pass}`);
+    }
     await db.execute({
       sql: 'INSERT INTO admins (username, password_hash) VALUES (?, ?)',
-      args: [process.env.ADMIN_USER || 'admin', hash],
+      args: [process.env.ADMIN_USER || 'admin', bcrypt.hashSync(pass, 10)],
     });
-    console.log(`✅ Default admin created → username: ${process.env.ADMIN_USER || 'admin'} | password: ${defaultPass}`);
-    console.log('   ⚠️  Change this password immediately after first login!');
+    console.log('✅ First admin account created. Change the password from the admin panel → Settings.');
   }
 }
-const dbReady = initDb().catch(err => console.error('❌ Database init failed:', err.message));
+const dbReady = initDb();
+dbReady.catch(err => console.error('❌ Database init failed:', err.message));
+
+// ─── HELPERS ──────────────────────────────────────────────────────────────────
+function safeJson(s, fallback) { try { const v = JSON.parse(s); return v ?? fallback; } catch { return fallback; } }
+const str = (v, max) => String(v ?? '').trim().slice(0, max);
+const int = (v, min = 0, max = 1e12) => { const n = parseInt(v, 10); return Number.isFinite(n) ? Math.min(Math.max(n, min), max) : 0; };
+const isHttpUrl = (u) => /^https?:\/\/[^\s"'<>]+$/i.test(u);
+const TYPES = ['FOR SALE', 'FOR RENT'];
+const CATEGORIES = ['Residential', 'Commercial', 'Apartment', 'Plot'];
+const STATUSES = ['available', 'sold', 'rented'];
+
+function hydrate(row) {
+  if (!row) return row;
+  const images = safeJson(row.images, []);
+  return { ...row, images: images.length ? images : (row.img ? [row.img] : []), price_pkr: Number(row.price_pkr) || 0, beds: Number(row.beds) || 0, baths: Number(row.baths) || 0 };
+}
+
+/** Validates/normalises a property payload. Returns { error } or { value }. */
+function cleanProperty(body, { partial = false } = {}) {
+  const out = {};
+  const has = (k) => body[k] !== undefined;
+  if (!partial || has('title'))    { out.title = str(body.title, 120); if (!out.title) return { error: 'Title is required' }; }
+  if (!partial || has('location')) { out.location = str(body.location, 160); if (!out.location) return { error: 'Location is required' }; }
+  if (!partial || has('type'))     { out.type = TYPES.includes(body.type) ? body.type : 'FOR SALE'; }
+  if (!partial || has('category')) { out.category = CATEGORIES.includes(body.category) ? body.category : 'Residential'; }
+  if (has('city') || !partial)     { out.city = str(body.city, 60) || (out.location ? cityFromLocation(out.location) : ''); }
+  if (has('price_pkr') || has('price') || !partial) {
+    out.price_pkr = Math.min(parsePrice(body.price_pkr ?? body.price), 1e12);
+    if (!out.price_pkr) return { error: 'A valid price is required' };
+  }
+  if (has('area') || !partial)  out.area  = str(body.area, 20).replace(/[^\d.]/g, '');
+  if (has('beds') || !partial)  out.beds  = int(body.beds, 0, 50);
+  if (has('baths') || !partial) out.baths = int(body.baths, 0, 50);
+  if (has('floor') || !partial) out.floor = str(body.floor, 30);
+  if (has('desc') || !partial)  out.desc  = str(body.desc, 4000);
+  if (has('status')) { if (!STATUSES.includes(body.status)) return { error: 'Invalid status' }; out.status = body.status; }
+  if (has('images') || has('img') || !partial) {
+    const raw = (Array.isArray(body.images) ? body.images : [body.img]).map(u => str(u, 600)).filter(Boolean);
+    if (raw.some(u => !isHttpUrl(u))) return { error: 'Every image must be a valid http(s) URL' };
+    out.images = raw.length ? raw.slice(0, 20) : ['/assets/placeholder.svg'];
+  }
+  return { value: out };
+}
+
+async function insertProperty(p) {
+  const type = p.type || 'FOR SALE';
+  const price = formatPrice(p.price_pkr, type);
+  await db.execute({
+    sql: `INSERT INTO properties (id, title, location, city, type, category, price, price_pkr, area, beds, baths, floor, img, images, desc, status)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    args: [p.id, p.title, p.location, p.city || cityFromLocation(p.location), type, p.category || 'Residential', price, p.price_pkr,
+      p.area || '', p.beds || 0, p.baths || 0, p.floor || '', p.images[0] || '', JSON.stringify(p.images), p.desc || '', p.status || 'available'],
+  });
+}
 
 // ─── MIDDLEWARE ───────────────────────────────────────────────────────────────
-app.use(cors());
-app.use(bodyParser.json());
-app.use(express.static(path.join(__dirname, 'public')));
-app.use((req, res, next) => { dbReady.then(() => next()).catch(next); });
-
-// Request logger
+app.disable('x-powered-by');
+app.set('trust proxy', 1); // Vercel sits behind a proxy — needed for real client IPs
 app.use((req, res, next) => {
-  if (req.path.startsWith('/api')) {
-    console.log(`[${new Date().toLocaleTimeString()}] ${req.method} ${req.path}`);
-  }
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+  res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+  next();
+});
+// Site and API share one origin, so no CORS headers are sent (other sites can't call the API from a browser).
+app.use(express.json({ limit: '50kb' }));
+app.use(express.static(path.join(__dirname, 'public'), { maxAge: IS_PROD ? '1h' : 0, extensions: ['html'] }));
+app.use((req, res, next) => { dbReady.then(() => next(), next); });
+app.use((req, res, next) => {
+  if (req.path.startsWith('/api')) console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
   next();
 });
 
-// ─── STATELESS AUTH (signed token — no server-side session store) ────────────
-// Vercel functions are stateless and ephemeral: tokens kept in an in-memory
-// Set() (the original approach) vanish on every cold start / restart and
-// differ between concurrent instances, causing unpredictable "logged out"
-// behaviour. A signed token carries everything needed to verify itself, so
-// there's nothing server-side that can go missing between requests.
-const SESSION_SECRET = process.env.SESSION_SECRET || 'midland-secret-change-me-in-production';
-const SESSION_MAX_AGE_MS = 1000 * 60 * 60 * 12; // 12 hours
+// Simple in-memory rate limiter. On Vercel each instance has its own counter, so this
+// slows abuse down rather than guaranteeing a hard limit.
+const hits = new Map();
+function rateLimit(max, windowMs) {
+  return (req, res, next) => {
+    const key = `${req.ip}|${req.path}`, now = Date.now();
+    const recent = (hits.get(key) || []).filter(t => now - t < windowMs);
+    if (recent.length >= max) {
+      res.setHeader('Retry-After', Math.ceil(windowMs / 1000));
+      return res.status(429).json({ error: 'Too many requests. Please try again later.' });
+    }
+    recent.push(now); hits.set(key, recent);
+    req.resetRateLimit = () => hits.delete(key);
+    if (hits.size > 5000) for (const [k, v] of hits) if (!v.some(t => now - t < windowMs)) hits.delete(k);
+    next();
+  };
+}
 
+// ─── AUTH (signed, stateless token) ───────────────────────────────────────────
 function signToken(payload) {
   const data = Buffer.from(JSON.stringify(payload)).toString('base64url');
   const sig = crypto.createHmac('sha256', SESSION_SECRET).update(data).digest('base64url');
@@ -151,62 +247,51 @@ function verifyToken(token) {
   if (!token || typeof token !== 'string' || !token.includes('.')) return null;
   const [data, sig] = token.split('.');
   const expected = crypto.createHmac('sha256', SESSION_SECRET).update(data).digest('base64url');
-  const a = Buffer.from(sig || '');
-  const b = Buffer.from(expected);
+  const a = Buffer.from(sig || ''), b = Buffer.from(expected);
   if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) return null;
   try {
     const payload = JSON.parse(Buffer.from(data, 'base64url').toString());
-    if (!payload.exp || payload.exp < Date.now()) return null;
-    return payload;
-  } catch {
-    return null;
-  }
+    return payload.exp && payload.exp > Date.now() ? payload : null;
+  } catch { return null; }
 }
-
 function requireAdmin(req, res, next) {
-  const token = req.headers['x-admin-token'];
-  const payload = verifyToken(token);
-  if (!payload) return res.status(401).json({ error: 'Unauthorized. Please log in via /api/admin/login' });
+  const payload = verifyToken(req.headers['x-admin-token']);
+  if (!payload) return res.status(401).json({ error: 'Session expired. Please log in again.' });
   req.admin = payload;
   next();
 }
 
-// ─── AUTH ROUTES ──────────────────────────────────────────────────────────────
-app.post('/api/admin/login', async (req, res) => {
-  const { username, password } = req.body || {};
+app.post('/api/admin/login', rateLimit(5, 15 * 60 * 1000), async (req, res) => {
+  const username = str(req.body?.username, 60), password = String(req.body?.password || '');
   if (!username || !password) return res.status(400).json({ error: 'Username and password required' });
   try {
     const { rows } = await db.execute({ sql: 'SELECT * FROM admins WHERE username = ?', args: [username] });
     const admin = rows[0];
     if (!admin || !bcrypt.compareSync(password, admin.password_hash)) {
-      console.warn(`⚠️  Failed login for "${username}"`);
-      return res.status(401).json({ error: 'Invalid credentials' });
+      console.warn(`⚠️  Failed login for "${username}" from ${req.ip}`);
+      return res.status(401).json({ error: 'Invalid username or password' });
     }
+    req.resetRateLimit?.(); // only failed attempts count towards the limit
     const token = signToken({ id: admin.id, username: admin.username, exp: Date.now() + SESSION_MAX_AGE_MS });
-    console.log(`✅ Admin logged in`);
-    res.json({ success: true, token });
+    res.json({ success: true, token, username: admin.username });
   } catch (err) {
     console.error('Login error:', err.message);
     res.status(500).json({ error: 'Server error' });
   }
 });
 
-app.post('/api/admin/logout', requireAdmin, (req, res) => {
-  // Stateless tokens can't be revoked server-side; the frontend discards it.
-  res.json({ success: true });
-});
+app.post('/api/admin/logout', requireAdmin, (req, res) => res.json({ success: true }));
 
-app.patch('/api/admin/change-password', requireAdmin, async (req, res) => {
+app.patch('/api/admin/change-password', requireAdmin, rateLimit(5, 15 * 60 * 1000), async (req, res) => {
   const { currentPassword, newPassword } = req.body || {};
-  if (!newPassword || newPassword.length < 6)
-    return res.status(400).json({ error: 'New password must be at least 6 characters.' });
+  if (!newPassword || String(newPassword).length < 10)
+    return res.status(400).json({ error: 'New password must be at least 10 characters.' });
   try {
     const { rows } = await db.execute({ sql: 'SELECT * FROM admins WHERE id=?', args: [req.admin.id] });
     const admin = rows[0];
-    if (!admin || !bcrypt.compareSync(currentPassword, admin.password_hash))
+    if (!admin || !bcrypt.compareSync(String(currentPassword || ''), admin.password_hash))
       return res.status(401).json({ error: 'Current password is incorrect.' });
-    const hash = bcrypt.hashSync(newPassword, 10);
-    await db.execute({ sql: 'UPDATE admins SET password_hash=? WHERE id=?', args: [hash, req.admin.id] });
+    await db.execute({ sql: 'UPDATE admins SET password_hash=? WHERE id=?', args: [bcrypt.hashSync(String(newPassword), 10), req.admin.id] });
     res.json({ success: true });
   } catch (err) {
     console.error('Password change error:', err.message);
@@ -214,43 +299,87 @@ app.patch('/api/admin/change-password', requireAdmin, async (req, res) => {
   }
 });
 
-// ─── PROPERTY ID GENERATOR ────────────────────────────────────────────────────
+// ─── PUBLIC API ───────────────────────────────────────────────────────────────
+app.get('/api/config', (req, res) => {
+  res.json({ whatsapp: SITE.whatsapp, phone: SITE.phone, email: SITE.email, address: SITE.address, hours: SITE.hours });
+});
+
 async function genPropId(type, category) {
   const prefix = category === 'Commercial' ? 'C' : (type === 'FOR RENT' ? 'R' : 'S');
-  const { rows } = await db.execute({ sql: `SELECT id FROM properties WHERE id LIKE ?`, args: [prefix + '%'] });
-  const nums = rows.map(r => parseInt(r.id.slice(1)) || 0);
-  const next = nums.length ? Math.max(...nums) + 1 : 1;
-  return prefix + String(next).padStart(4, '0');
+  const { rows } = await db.execute({ sql: 'SELECT id FROM properties WHERE id LIKE ?', args: [prefix + '%'] });
+  const nums = rows.map(r => parseInt(String(r.id).slice(1), 10) || 0);
+  return prefix + String((nums.length ? Math.max(...nums) : 0) + 1).padStart(4, '0');
 }
 
-// ─── PUBLIC: PROPERTIES ────────────────────────────────────────────────────────
 app.get('/api/properties', async (req, res) => {
   try {
     let sql = "SELECT * FROM properties WHERE status = 'available'";
     const args = [];
-    if (req.query.type && req.query.type !== 'all') {
-      sql += ' AND type = ?';
-      args.push(req.query.type);
-    }
+    if (TYPES.includes(req.query.type)) { sql += ' AND type = ?'; args.push(req.query.type); }
     sql += ' ORDER BY createdAt DESC';
     const { rows } = await db.execute({ sql, args });
-    res.json(rows);
+    res.setHeader('Cache-Control', 'public, max-age=30, stale-while-revalidate=300');
+    res.json(rows.map(hydrate));
   } catch (err) {
     console.error('Query error:', err.message);
     res.status(500).json({ error: 'Server error' });
   }
 });
 
+async function getAvailableProperty(id) {
+  const { rows } = await db.execute({ sql: "SELECT * FROM properties WHERE id = ? AND status = 'available'", args: [String(id)] });
+  return hydrate(rows[0]);
+}
+
 app.get('/api/properties/:id', async (req, res) => {
   try {
-    const { rows } = await db.execute({
-      sql: "SELECT * FROM properties WHERE id = ? AND status = 'available'",
-      args: [req.params.id],
+    const p = await getAvailableProperty(req.params.id);
+    if (!p) return res.status(404).json({ error: 'Property not found' });
+    res.json(p);
+  } catch { res.status(500).json({ error: 'Server error' }); }
+});
+
+const PURPOSES = ['Buy a Property', 'Rent a Property', 'Sell My Property', 'Construction Consultation', 'Investment Inquiry', 'General Inquiry'];
+const TIMES = ['10:00 AM', '11:00 AM', '12:00 PM', '01:00 PM', '02:00 PM', '03:00 PM', '04:00 PM', '05:00 PM', '06:00 PM'];
+
+app.post('/api/appointments', rateLimit(5, 60 * 60 * 1000), async (req, res) => {
+  const b = req.body || {};
+  if (b.website) return res.status(201).json({ success: true, id: uuidv4() }); // honeypot: silently drop bots
+  const c = {
+    name: str(b.name, 80), email: str(b.email, 120).toLowerCase(), phone: str(b.phone, 20),
+    date: str(b.date, 10), time: TIMES.includes(b.time) ? b.time : '',
+    purpose: PURPOSES.includes(b.purpose) ? b.purpose : 'General Inquiry',
+    msg: str(b.msg, 1000), propertyId: str(b.propertyId, 10),
+  };
+  const errors = {};
+  if (c.name.length < 2) errors.name = 'Please enter your full name.';
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(c.email)) errors.email = 'Please enter a valid email address.';
+  if (!/^\+?[0-9][0-9\s-]{8,16}$/.test(c.phone)) errors.phone = 'Please enter a valid phone number, e.g. 0300 1234567.';
+  const d = /^\d{4}-\d{2}-\d{2}$/.test(c.date) ? new Date(c.date + 'T00:00:00Z') : null;
+  const todayPk = new Date(Date.now() + 5 * 3600 * 1000).toISOString().slice(0, 10); // Pakistan time (UTC+5)
+  if (!d || isNaN(d)) errors.date = 'Please choose a date.';
+  else if (c.date < todayPk) errors.date = 'Please choose a date from today onwards.';
+  else if (d.getUTCDay() === 0) errors.date = 'We are closed on Sundays — please pick Monday to Saturday.';
+  else if ((d - new Date(todayPk + 'T00:00:00Z')) / 864e5 > 180) errors.date = 'Please choose a date within the next 6 months.';
+  if (Object.keys(errors).length) return res.status(400).json({ error: Object.values(errors)[0], errors });
+
+  try {
+    let propertyName = '';
+    if (c.propertyId) {
+      const p = await getAvailableProperty(c.propertyId);
+      if (p) propertyName = p.title; else c.propertyId = '';
+    }
+    const id = uuidv4();
+    await db.execute({
+      sql: `INSERT INTO appointments (id, name, email, phone, date, time, purpose, msg, propertyId, propertyName, confirmed)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)`,
+      args: [id, c.name, c.email, c.phone, c.date, c.time, c.purpose, c.msg, c.propertyId, propertyName],
     });
-    if (!rows[0]) return res.status(404).json({ error: 'Property not found' });
-    res.json(rows[0]);
+    console.log(`📅 Appointment booked for ${c.date}${c.propertyId ? ' (property ' + c.propertyId + ')' : ''}`);
+    res.status(201).json({ success: true, id, ref: id.slice(0, 8).toUpperCase(), propertyName });
   } catch (err) {
-    res.status(500).json({ error: 'Server error' });
+    console.error('Insert error:', err.message);
+    res.status(500).json({ error: 'Server error — please try again or contact us on WhatsApp.' });
   }
 });
 
@@ -258,36 +387,19 @@ app.get('/api/properties/:id', async (req, res) => {
 app.get('/api/admin/properties', requireAdmin, async (req, res) => {
   try {
     const { rows } = await db.execute('SELECT * FROM properties ORDER BY createdAt DESC');
-    res.json(rows);
-  } catch (err) {
-    res.status(500).json({ error: 'Server error' });
-  }
+    res.json(rows.map(hydrate));
+  } catch { res.status(500).json({ error: 'Server error' }); }
 });
 
 app.post('/api/admin/properties', requireAdmin, async (req, res) => {
-  const { title, location, type, category, price, area, beds, baths, floor, img, desc } = req.body;
-  if (!title || !location || !price)
-    return res.status(400).json({ error: 'title, location, and price are required' });
+  const { error, value } = cleanProperty(req.body || {});
+  if (error) return res.status(400).json({ error });
   try {
-    const id = await genPropId(type || 'FOR SALE', category || 'Residential');
-    const prop = {
-      id, title, location,
-      type: type || 'FOR SALE',
-      category: category || 'Residential',
-      price, area: area || '',
-      beds: parseInt(beds) || 0,
-      baths: parseInt(baths) || 0,
-      floor: floor || '',
-      img: img || 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=600',
-      desc: desc || '',
-    };
-    await db.execute({
-      sql: `INSERT INTO properties (id, title, location, type, category, price, area, beds, baths, floor, img, desc, status)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'available')`,
-      args: [prop.id, prop.title, prop.location, prop.type, prop.category, prop.price, prop.area, prop.beds, prop.baths, prop.floor, prop.img, prop.desc],
-    });
-    console.log(`🏠 Property added: "${title}"`);
-    res.status(201).json({ ...prop, status: 'available' });
+    const id = await genPropId(value.type, value.category);
+    await insertProperty({ ...value, id, status: 'available' });
+    const { rows } = await db.execute({ sql: 'SELECT * FROM properties WHERE id=?', args: [id] });
+    console.log(`🏠 Property added: ${id}`);
+    res.status(201).json(hydrate(rows[0]));
   } catch (err) {
     console.error('Insert error:', err.message);
     res.status(500).json({ error: 'Server error' });
@@ -295,19 +407,20 @@ app.post('/api/admin/properties', requireAdmin, async (req, res) => {
 });
 
 app.patch('/api/admin/properties/:id', requireAdmin, async (req, res) => {
-  const { id } = req.params;
-  const allowed = ['status', 'title', 'price', 'desc', 'img', 'area', 'floor'];
-  const updates = [], args = [];
-  allowed.forEach(k => { if (req.body[k] !== undefined) { updates.push(`${k}=?`); args.push(req.body[k]); } });
-  if (!updates.length) return res.status(400).json({ error: 'Nothing to update' });
+  const { error, value } = cleanProperty(req.body || {}, { partial: true });
+  if (error) return res.status(400).json({ error });
   try {
-    const { rows } = await db.execute({ sql: 'SELECT * FROM properties WHERE id=?', args: [id] });
-    if (!rows[0]) return res.status(404).json({ error: 'Property not found' });
-    args.push(id);
-    await db.execute({ sql: `UPDATE properties SET ${updates.join(',')} WHERE id=?`, args });
-    const { rows: updated } = await db.execute({ sql: 'SELECT * FROM properties WHERE id=?', args: [id] });
-    console.log(`✏️  Property updated: "${updated[0].title}" → ${JSON.stringify(req.body)}`);
-    res.json(updated[0]);
+    const { rows } = await db.execute({ sql: 'SELECT * FROM properties WHERE id=?', args: [req.params.id] });
+    const current = rows[0];
+    if (!current) return res.status(404).json({ error: 'Property not found' });
+    if (value.images) { value.img = value.images[0]; value.images = JSON.stringify(value.images); }
+    if (value.price_pkr !== undefined || value.type !== undefined)
+      value.price = formatPrice(value.price_pkr ?? current.price_pkr, value.type ?? current.type);
+    const keys = Object.keys(value);
+    if (!keys.length) return res.status(400).json({ error: 'Nothing to update' });
+    await db.execute({ sql: `UPDATE properties SET ${keys.map(k => `${k}=?`).join(',')} WHERE id=?`, args: [...keys.map(k => value[k]), req.params.id] });
+    const { rows: updated } = await db.execute({ sql: 'SELECT * FROM properties WHERE id=?', args: [req.params.id] });
+    res.json(hydrate(updated[0]));
   } catch (err) {
     console.error('Update error:', err.message);
     res.status(500).json({ error: 'Server error' });
@@ -316,125 +429,115 @@ app.patch('/api/admin/properties/:id', requireAdmin, async (req, res) => {
 
 app.delete('/api/admin/properties/:id', requireAdmin, async (req, res) => {
   try {
-    const { rows } = await db.execute({ sql: 'SELECT * FROM properties WHERE id=?', args: [req.params.id] });
-    if (!rows[0]) return res.status(404).json({ error: 'Property not found' });
-    await db.execute({ sql: 'DELETE FROM properties WHERE id=?', args: [req.params.id] });
-    console.log(`🗑  Property removed: "${rows[0].title}"`);
+    const r = await db.execute({ sql: 'DELETE FROM properties WHERE id=?', args: [req.params.id] });
+    if (!r.rowsAffected) return res.status(404).json({ error: 'Property not found' });
     res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ error: 'Server error' });
-  }
-});
-
-// ─── PUBLIC: APPOINTMENTS ─────────────────────────────────────────────────────
-app.post('/api/appointments', async (req, res) => {
-  const { name, email, phone, date, time, purpose, msg, propertyId, propertyName } = req.body;
-  if (!name || !email || !phone || !date)
-    return res.status(400).json({ error: 'name, email, phone, and date are required' });
-  try {
-    const id = uuidv4();
-    await db.execute({
-      sql: `INSERT INTO appointments (id, name, email, phone, date, time, purpose, msg, propertyId, propertyName, confirmed)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)`,
-      args: [id, name, email, phone, date, time || '', purpose || 'General Inquiry', msg || '', propertyId || '', propertyName || ''],
-    });
-    console.log(`📅 Appointment: ${name} <${email}> on ${date}${propertyId ? ' for property ' + propertyId : ''}`);
-    res.status(201).json({ success: true, id });
-  } catch (err) {
-    console.error('Insert error:', err.message);
-    res.status(500).json({ error: 'Server error' });
-  }
+  } catch { res.status(500).json({ error: 'Server error' }); }
 });
 
 // ─── ADMIN: APPOINTMENTS ──────────────────────────────────────────────────────
 app.get('/api/admin/appointments', requireAdmin, async (req, res) => {
   try {
-    const { rows } = await db.execute('SELECT * FROM appointments ORDER BY createdAt DESC');
+    const { rows } = await db.execute('SELECT * FROM appointments ORDER BY date ASC, createdAt DESC');
     res.json(rows.map(a => ({ ...a, confirmed: !!a.confirmed })));
-  } catch (err) {
-    res.status(500).json({ error: 'Server error' });
-  }
+  } catch { res.status(500).json({ error: 'Server error' }); }
 });
 
+// Bulk delete requires an explicit confirmation phrase so it can't happen by accident.
 app.delete('/api/admin/appointments', requireAdmin, async (req, res) => {
+  if ((req.body || {}).confirm !== 'DELETE ALL') return res.status(400).json({ error: 'Confirmation phrase required' });
   try {
-    const { rows } = await db.execute('SELECT COUNT(*) as count FROM appointments');
-    await db.execute('DELETE FROM appointments');
-    console.log(`🗑  Cleared ${rows[0].count} appointments`);
-    res.json({ success: true, cleared: rows[0].count });
-  } catch (err) {
-    res.status(500).json({ error: 'Server error' });
-  }
+    const r = await db.execute('DELETE FROM appointments');
+    console.log(`🗑  Cleared ${r.rowsAffected} appointments (by ${req.admin.username})`);
+    res.json({ success: true, cleared: r.rowsAffected });
+  } catch { res.status(500).json({ error: 'Server error' }); }
 });
 
 app.patch('/api/admin/appointments/:id', requireAdmin, async (req, res) => {
   try {
-    const { rows } = await db.execute({ sql: 'SELECT * FROM appointments WHERE id=?', args: [req.params.id] });
+    const { rows } = await db.execute({ sql: 'SELECT id FROM appointments WHERE id=?', args: [req.params.id] });
     if (!rows[0]) return res.status(404).json({ error: 'Appointment not found' });
-    if (req.body.confirmed !== undefined) {
+    if (req.body?.confirmed !== undefined)
       await db.execute({ sql: 'UPDATE appointments SET confirmed=? WHERE id=?', args: [req.body.confirmed ? 1 : 0, req.params.id] });
-    }
     const { rows: updated } = await db.execute({ sql: 'SELECT * FROM appointments WHERE id=?', args: [req.params.id] });
-    console.log(`✅ Appointment ${req.params.id} confirmed for ${updated[0].name}`);
     res.json({ ...updated[0], confirmed: !!updated[0].confirmed });
-  } catch (err) {
-    res.status(500).json({ error: 'Server error' });
-  }
+  } catch { res.status(500).json({ error: 'Server error' }); }
 });
 
 app.delete('/api/admin/appointments/:id', requireAdmin, async (req, res) => {
   try {
-    const { rows } = await db.execute({ sql: 'SELECT id FROM appointments WHERE id=?', args: [req.params.id] });
-    if (!rows[0]) return res.status(404).json({ error: 'Appointment not found' });
-    await db.execute({ sql: 'DELETE FROM appointments WHERE id=?', args: [req.params.id] });
+    const r = await db.execute({ sql: 'DELETE FROM appointments WHERE id=?', args: [req.params.id] });
+    if (!r.rowsAffected) return res.status(404).json({ error: 'Appointment not found' });
     res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ error: 'Server error' });
-  }
+  } catch { res.status(500).json({ error: 'Server error' }); }
 });
 
-// ─── ADMIN: STATS ─────────────────────────────────────────────────────────────
 app.get('/api/admin/stats', requireAdmin, async (req, res) => {
   try {
-    const q = async (sql) => (await db.execute(sql)).rows[0].n;
-    const totalProperties  = await q("SELECT COUNT(*) as n FROM properties");
-    const available        = await q("SELECT COUNT(*) as n FROM properties WHERE status='available'");
-    const sold              = await q("SELECT COUNT(*) as n FROM properties WHERE status='sold'");
-    const rented             = await q("SELECT COUNT(*) as n FROM properties WHERE status='rented'");
-    const forSale           = await q("SELECT COUNT(*) as n FROM properties WHERE type='FOR SALE'");
-    const forRent            = await q("SELECT COUNT(*) as n FROM properties WHERE type='FOR RENT'");
-    const totalAppointments = await q("SELECT COUNT(*) as n FROM appointments");
-    const newAppointments   = await q("SELECT COUNT(*) as n FROM appointments WHERE confirmed=0");
-    res.json({ totalProperties, available, sold, rented, forSale, forRent, totalAppointments, newAppointments });
-  } catch (err) {
-    res.status(500).json({ error: 'Server error' });
-  }
+    const q = async (sql) => Number((await db.execute(sql)).rows[0].n);
+    res.json({
+      totalProperties:   await q('SELECT COUNT(*) as n FROM properties'),
+      available:         await q("SELECT COUNT(*) as n FROM properties WHERE status='available'"),
+      sold:              await q("SELECT COUNT(*) as n FROM properties WHERE status='sold'"),
+      rented:            await q("SELECT COUNT(*) as n FROM properties WHERE status='rented'"),
+      totalAppointments: await q('SELECT COUNT(*) as n FROM appointments'),
+      newAppointments:   await q('SELECT COUNT(*) as n FROM appointments WHERE confirmed=0'),
+    });
+  } catch { res.status(500).json({ error: 'Server error' }); }
 });
 
-// ─── HEALTH CHECK ─────────────────────────────────────────────────────────────
 app.get('/api/health', async (req, res) => {
   try {
-    const props = (await db.execute('SELECT COUNT(*) as n FROM properties')).rows[0].n;
-    const appts = (await db.execute('SELECT COUNT(*) as n FROM appointments')).rows[0].n;
-    res.json({ status: 'ok', uptime: process.uptime().toFixed(0) + 's', properties: props, appointments: appts });
-  } catch (err) {
-    res.status(500).json({ status: 'error', error: err.message });
-  }
+    const n = async (t) => Number((await db.execute(`SELECT COUNT(*) as n FROM ${t}`)).rows[0].n);
+    res.json({ status: 'ok', persistentDb: usingTurso, properties: await n('properties'), appointments: await n('appointments') });
+  } catch { res.status(500).json({ status: 'error' }); }
 });
 
-// ─── CATCH-ALL: SPA ───────────────────────────────────────────────────────────
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+// ─── SERVER-RENDERED PAGES (SEO + rich WhatsApp previews) ─────────────────────
+const baseUrl = (req) => SITE.url || `${req.protocol}://${req.get('host')}`;
+
+app.get('/property/:id', async (req, res, next) => {
+  try {
+    const p = await getAvailableProperty(req.params.id);
+    if (!p) return res.status(404).send(renderNotFound(SITE));
+    const { rows } = await db.execute({
+      sql: "SELECT * FROM properties WHERE status='available' AND id != ? ORDER BY (type = ?) DESC, createdAt DESC LIMIT 3",
+      args: [p.id, p.type],
+    });
+    res.setHeader('Cache-Control', 'public, max-age=60, stale-while-revalidate=600');
+    res.send(renderPropertyPage(p, rows.map(hydrate), SITE, baseUrl(req)));
+  } catch (err) { next(err); }
 });
 
-// ─── START SERVER ─────────────────────────────────────────────────────────────
+const legal = require('./views/legal');
+app.get('/privacy', (req, res) => res.send(legal.privacy(SITE)));
+app.get('/terms', (req, res) => res.send(legal.terms(SITE)));
+
+app.get('/robots.txt', (req, res) => {
+  res.type('text/plain').send(`User-agent: *\nDisallow: /admin\nDisallow: /api/\nSitemap: ${baseUrl(req)}/sitemap.xml\n`);
+});
+
+app.get('/sitemap.xml', async (req, res) => {
+  const base = baseUrl(req);
+  const { rows } = await db.execute("SELECT id, createdAt FROM properties WHERE status='available'");
+  const urls = [`${base}/`, `${base}/privacy`, `${base}/terms`, ...rows.map(r => `${base}/property/${r.id}`)];
+  res.type('application/xml').send(`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map(u => `  <url><loc>${u}</loc></url>`).join('\n')}\n</urlset>`);
+});
+
+// Unknown API routes → JSON 404; unknown pages → a real 404 page (not the homepage).
+app.use('/api', (req, res) => res.status(404).json({ error: 'Not found' }));
+app.use((req, res) => res.status(404).send(renderNotFound(SITE)));
+app.use((err, req, res, next) => {
+  console.error('Unhandled error:', err);
+  if (req.path.startsWith('/api')) return res.status(500).json({ error: 'Server error' });
+  res.status(500).send('Something went wrong. Please try again.');
+});
+
 if (!process.env.VERCEL) {
   app.listen(PORT, () => {
-    console.log('\n╔════════════════════════════════════════════╗');
-    console.log(`║   🏠  MidLand Constructions API            ║`);
-    console.log(`║   Website  → http://localhost:${PORT}        ║`);
-    console.log(`║   Admin    → http://localhost:${PORT}/admin.html ║`);
-    console.log('╚════════════════════════════════════════════╝\n');
+    console.log(`\n🏠 MidLand Constructions running`);
+    console.log(`   Website → http://localhost:${PORT}`);
+    console.log(`   Admin   → http://localhost:${PORT}/admin\n`);
   });
 }
 
